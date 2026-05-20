@@ -8,7 +8,9 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { createHookLogger } from './logger.ts';
 
+const log = createHookLogger('PostToolUse', 'token-stats-tool.ts');
 const PREVIEW_LIMIT = 500;
 
 interface PostToolUseInput {
@@ -93,6 +95,8 @@ async function main(): Promise<void> {
     } catch { /* ignore */ }
   }
 
+  log.info(`${toolName} → ~${fmtNum(resultTokenEst)} tokens (turn ${turnIdx})`);
+
   process.stdout.write(`${JSON.stringify({
     systemMessage: `[token-stats] ${toolName} → ~${fmtNum(resultTokenEst)} tokens (${fmtNum(resultChars)} chars) | turn ${turnIdx}`,
   })}\n`);
@@ -103,6 +107,8 @@ async function main(): Promise<void> {
     const mod = await import('@prisma/client');
     PrismaClient = mod.PrismaClient;
   } catch {
+    log.warn('Prisma client not available, DB write skipped');
+    log.done('completed (no DB)');
     return;
   }
 
@@ -119,8 +125,8 @@ async function main(): Promise<void> {
         ts: new Date(),
       },
     })
-    .then(() => prisma.$disconnect())
-    .catch(() => prisma.$disconnect());
+    .then(() => { prisma.$disconnect(); log.done('DB write ok'); })
+    .catch(() => { prisma.$disconnect(); log.done('DB write failed', 'warn'); });
 }
 
 main().catch(() => process.exit(0));

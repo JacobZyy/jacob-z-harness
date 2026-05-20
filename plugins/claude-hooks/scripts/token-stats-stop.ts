@@ -8,6 +8,9 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { createHookLogger } from './logger.ts';
+
+const log = createHookLogger('Stop', 'token-stats-stop.ts');
 
 interface Usage {
   input_tokens?: number;
@@ -180,12 +183,14 @@ async function main(): Promise<void> {
   const cacheRead = usage.cache_read_input_tokens ?? 0;
   const cacheWrite = usage.cache_creation_input_tokens ?? 0;
 
+  log.info(`turn ${turnIdx} | ${model} | in:${fmtNum(inTokens)} out:${fmtNum(outTokens)} cache_r:${fmtNum(cacheRead)} cache_w:${fmtNum(cacheWrite)} | $${costEstUsd.toFixed(4)}`);
+
   let PrismaClient: typeof import('@prisma/client').PrismaClient;
   try {
     const mod = await import('@prisma/client');
     PrismaClient = mod.PrismaClient;
   } catch {
-    // prisma client 未生成，静默跳过
+    log.warn('Prisma client not available, DB write skipped');
     emit({
       systemMessage: [
         `[token-stats] 本轮消耗 (模型: ${model})`,
@@ -220,6 +225,8 @@ async function main(): Promise<void> {
   } finally {
     await prisma.$disconnect();
   }
+
+  log.done(`turn ${turnIdx} completed | ${fmtNum(inTokens + outTokens + cacheRead + cacheWrite)} tokens total`);
 
   emit({
     systemMessage: [

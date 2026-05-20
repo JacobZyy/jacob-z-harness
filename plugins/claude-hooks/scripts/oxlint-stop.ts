@@ -19,6 +19,9 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, relative } from 'node:path';
+import { createHookLogger } from './logger.ts';
+
+const log = createHookLogger('Stop', 'oxlint-stop.ts');
 
 interface StopHookInput {
   transcript_path?: string;
@@ -112,6 +115,7 @@ function main(): void {
 
   // spawnSync 出错（ENOENT 等）→ 视为基础设施问题，静默
   if (oxlint.error) {
+    log.error(`oxlint spawn error: ${oxlint.error.message}`);
     emit({
       systemMessage: `⚠️ [oxlint] 工具故障（${oxlint.error.message}），跳过本次检查`,
     });
@@ -124,6 +128,7 @@ function main(): void {
 
   switch (exitCode) {
     case 0:
+      log.done(`passed (${fileCount} TS files, 0 violations)`);
       emit({
         systemMessage: `✅ [oxlint] 类型偷懒断言检查通过（${fileCount} 个 TS 文件${skipNote}，0 违规）`,
       });
@@ -138,6 +143,8 @@ function main(): void {
       const summary = errorLine
         ? `❌ [oxlint] 检测到类型偷懒断言 — ${errorLine} 共扫描 ${fileCount} 个 TS 文件${skipNote}`
         : `❌ [oxlint] 检测到类型偷懒断言（${fileCount} 个 TS 文件${skipNote}）`;
+
+      log.done(`violations found (${fileCount} TS files)`, 'warn', oxlintOut.slice(0, 500));
 
       if (stopHookActive) {
         emit({
@@ -166,6 +173,7 @@ function main(): void {
 
     default:
       // 126 不可执行 / 127 找不到二进制 / 内部错误等
+      log.done(`oxlint tool failure (exit=${exitCode})`, 'error');
       emit({
         systemMessage: `⚠️ [oxlint] 工具故障 (exit=${exitCode})，跳过本次检查`,
       });
