@@ -8,7 +8,6 @@
  */
 
 import { readFileSync } from 'node:fs';
-import { PrismaClient } from '../node_modules/.prisma/client';
 
 interface Usage {
   input_tokens?: number;
@@ -180,6 +179,23 @@ async function main(): Promise<void> {
   const outTokens = usage.output_tokens ?? 0;
   const cacheRead = usage.cache_read_input_tokens ?? 0;
   const cacheWrite = usage.cache_creation_input_tokens ?? 0;
+
+  let PrismaClient: typeof import('@prisma/client').PrismaClient;
+  try {
+    const mod = await import('@prisma/client');
+    PrismaClient = mod.PrismaClient;
+  } catch {
+    // prisma client 未生成，静默跳过
+    emit({
+      systemMessage: [
+        `[token-stats] 本轮消耗 (模型: ${model})`,
+        `  输入: ${fmtNum(inTokens)} | 输出: ${fmtNum(outTokens)}`,
+        `  缓存读: ${fmtNum(cacheRead)} | 缓存写: ${fmtNum(cacheWrite)}`,
+        `  合计: ${fmtNum(inTokens + outTokens + cacheRead + cacheWrite)} tokens | 工具: ${toolCallCount} 次`,
+        `  ⚠ DB 写入跳过（Prisma 未就绪）`,
+      ].join('\n'),
+    });
+  }
 
   const prisma = new PrismaClient();
   try {

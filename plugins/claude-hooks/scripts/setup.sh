@@ -8,12 +8,25 @@ set -uo pipefail
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [ -z "$PLUGIN_ROOT" ] && exit 0
 
-# 检查 prisma client 是否已生成
+# ── 版本日志 ──────────────────────────────────────────────────────────────
+VERSION=$(grep '"version"' "$PLUGIN_ROOT/plugin.json" 2>/dev/null | head -1 | sed 's/.*"version" *: *"\([^"]*\)".*/\1/')
+echo "{\"systemMessage\":\"[claude-hooks] v${VERSION:-unknown} loaded\"}"
+
+# ── 确保 .env 存在（Prisma 需要 DATABASE_URL） ────────────────────────────
+ENV_FILE="$PLUGIN_ROOT/.env"
+DB_DIR="$HOME/.claude/data"
+mkdir -p "$DB_DIR" 2>/dev/null
+
+if [ ! -f "$ENV_FILE" ] || ! grep -q "DATABASE_URL" "$ENV_FILE" 2>/dev/null; then
+  echo "DATABASE_URL=file:$DB_DIR/token-stats.db" > "$ENV_FILE"
+fi
+
+# ── 检查 prisma client 是否已生成 ─────────────────────────────────────────
 if [ -f "$PLUGIN_ROOT/node_modules/.prisma/client/index.js" ]; then
   exit 0
 fi
 
-# 需要初始化 —— 同步执行，确保 Stop hook 触发时 client 已就绪
+# ── 需要初始化 —— 同步执行，确保 Stop hook 触发时 client 已就绪 ──────────
 # 整体限制 30s 超时，避免阻塞启动
 (
   cd "$PLUGIN_ROOT" || exit 0

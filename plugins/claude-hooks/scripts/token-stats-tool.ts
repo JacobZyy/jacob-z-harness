@@ -9,8 +9,6 @@
 
 import { readFileSync } from 'node:fs';
 
-import { PrismaClient } from '../node_modules/.prisma/client';
-
 const PREVIEW_LIMIT = 500;
 
 interface PostToolUseInput {
@@ -49,7 +47,7 @@ function fmtNum(n: number): string {
   return `${(n / 1_000_000).toFixed(1)}m`;
 }
 
-function main(): void {
+async function main(): Promise<void> {
   let raw = '';
   try {
     raw = readFileSync(0, 'utf8');
@@ -99,6 +97,15 @@ function main(): void {
     systemMessage: `[token-stats] ${toolName} → ~${fmtNum(resultTokenEst)} tokens (${fmtNum(resultChars)} chars) | turn ${turnIdx}`,
   })}\n`);
 
+  // 动态导入 Prisma — 如果 client 未生成（setup.sh 尚未完成），静默跳过
+  let PrismaClient: typeof import('@prisma/client').PrismaClient;
+  try {
+    const mod = await import('@prisma/client');
+    PrismaClient = mod.PrismaClient;
+  } catch {
+    return;
+  }
+
   const prisma = new PrismaClient();
   prisma.toolCall
     .create({
@@ -116,4 +123,4 @@ function main(): void {
     .catch(() => prisma.$disconnect());
 }
 
-main();
+main().catch(() => process.exit(0));
