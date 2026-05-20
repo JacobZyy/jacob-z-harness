@@ -43,6 +43,17 @@ function truncate(s: string, limit: number): string {
   return s.slice(0, limit) + '...';
 }
 
+function fmtNum(n: number): string {
+  if (n < 1_000) return String(n);
+  if (n < 1_000_000) return `${(n / 1_000).toFixed(1)}k`;
+  return `${(n / 1_000_000).toFixed(1)}m`;
+}
+
+function emit(resp: { systemMessage: string }): never {
+  process.stdout.write(`${JSON.stringify(resp)}\n`);
+  process.exit(0);
+}
+
 // Anthropic 官方定价 (USD per 1M tokens, 2026-05)
 function estimateCost(model: string, usage: Usage): number {
   const isOpus = model.includes('opus');
@@ -165,6 +176,10 @@ async function main(): Promise<void> {
   }
 
   const costEstUsd = estimateCost(model, usage);
+  const inTokens = usage.input_tokens ?? 0;
+  const outTokens = usage.output_tokens ?? 0;
+  const cacheRead = usage.cache_read_input_tokens ?? 0;
+  const cacheWrite = usage.cache_creation_input_tokens ?? 0;
 
   const prisma = new PrismaClient();
   try {
@@ -175,10 +190,10 @@ async function main(): Promise<void> {
         tsStart,
         tsEnd,
         model,
-        inputTokens: usage.input_tokens ?? 0,
-        outputTokens: usage.output_tokens ?? 0,
-        cacheRead: usage.cache_read_input_tokens ?? 0,
-        cacheWrite: usage.cache_creation_input_tokens ?? 0,
+        inputTokens: inTokens,
+        outputTokens: outTokens,
+        cacheRead,
+        cacheWrite,
         costEstUsd,
         userMsgPreview,
         toolCallCount,
@@ -189,6 +204,15 @@ async function main(): Promise<void> {
   } finally {
     await prisma.$disconnect();
   }
+
+  emit({
+    systemMessage: [
+      `[token-stats] 本轮消耗 (模型: ${model})`,
+      `  输入: ${fmtNum(inTokens)} | 输出: ${fmtNum(outTokens)}`,
+      `  缓存读: ${fmtNum(cacheRead)} | 缓存写: ${fmtNum(cacheWrite)}`,
+      `  合计: ${fmtNum(inTokens + outTokens + cacheRead + cacheWrite)} tokens | 工具: ${toolCallCount} 次`,
+    ].join('\n'),
+  });
 }
 
 main().catch(() => process.exit(0));

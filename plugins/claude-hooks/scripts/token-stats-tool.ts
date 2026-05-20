@@ -43,6 +43,12 @@ function truncate(s: string, limit: number): string {
   return s.slice(0, limit) + `... [truncated, total ${s.length} chars]`;
 }
 
+function fmtNum(n: number): string {
+  if (n < 1_000) return String(n);
+  if (n < 1_000_000) return `${(n / 1_000).toFixed(1)}k`;
+  return `${(n / 1_000_000).toFixed(1)}m`;
+}
+
 function main(): void {
   let raw = '';
   try {
@@ -88,6 +94,10 @@ function main(): void {
       }
     } catch { /* ignore */ }
   }
+
+  process.stdout.write(`${JSON.stringify({
+    systemMessage: `[token-stats] ${toolName} → ~${fmtNum(resultTokenEst)} tokens (${fmtNum(resultChars)} chars) | turn ${turnIdx}`,
+  })}\n`);
 
   const prisma = new PrismaClient();
   prisma.toolCall
