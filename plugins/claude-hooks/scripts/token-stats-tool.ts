@@ -49,6 +49,13 @@ function fmtNum(n: number): string {
   return `${(n / 1_000_000).toFixed(1)}m`;
 }
 
+function fmtToolLabel(name: string, input?: Record<string, unknown>): string {
+  if (name !== 'Bash' || !input?.command || typeof input.command !== 'string')
+    return name;
+  const preview = input.command.trim().split(/\s+/).slice(0, 2).join(' ');
+  return `Bash(${preview})`;
+}
+
 async function main(): Promise<void> {
   let raw = '';
   try {
@@ -95,10 +102,12 @@ async function main(): Promise<void> {
     } catch { /* ignore */ }
   }
 
-  log.info(`${toolName} → ~${fmtNum(resultTokenEst)} tokens (turn ${turnIdx})`);
+  const toolLabel = fmtToolLabel(toolName, input.tool_input);
+
+  log.info(`${toolLabel} → ~${fmtNum(resultTokenEst)} tokens (turn ${turnIdx})`);
 
   process.stdout.write(`${JSON.stringify({
-    systemMessage: `[token-stats] ${toolName} → ~${fmtNum(resultTokenEst)} tokens (${fmtNum(resultChars)} chars) | turn ${turnIdx}`,
+    systemMessage: `[token-stats] ${toolLabel} → ~${fmtNum(resultTokenEst)} tokens (${fmtNum(resultChars)} chars) | turn ${turnIdx}`,
   })}\n`);
 
   // 动态导入 Prisma — 如果 client 未生成（setup.sh 尚未完成），静默跳过
