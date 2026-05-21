@@ -11,18 +11,18 @@ input=$(cat)
 
 # ── Catppuccin Mocha palette (official) ──
 # https://catppuccin.com/palette/
-ROSEWATER="245;224;220"   # #f5e0dc  ← 1. model
-FLAMINGO="242;205;205"    # #f2cdcd  ← 2. folder
-PINK="245;194;231"        # #f5c2e7  ← 3. dirs
+ROSEWATER="245;224;220"   # #f5e0dc
+FLAMINGO="242;205;205"    # #f2cdcd
+PINK="245;194;231"        # #f5c2e7
 MAUVE="203;166;247"       # #cba6f7
-RED="243;139;168"         # #f38ba8  ← ctx ≥90%
-MAROON="235;160;172"      # #eba0ac  ← 4. agent
-PEACH="250;179;135"       # #fab387  ← 5. cwd
-YELLOW="249;226;175"      # #f9e2af  ← ctx 70-89%
-GREEN="166;227;161"       # #a6e3a1  ← ctx <70%
-TEAL="148;226;213"        # #94e2d5  ← 6. session-id
-SKY="137;220;235"         # #89dceb  ← 7. session-name
-SAPPHIRE="116;199;236"    # #74c7ec  ← 8. worktree
+RED="243;139;168"         # #f38ba8
+MAROON="235;160;172"      # #eba0ac
+PEACH="250;179;135"       # #fab387
+YELLOW="249;226;175"      # #f9e2af
+GREEN="166;227;161"       # #a6e3a1
+TEAL="148;226;213"        # #94e2d5
+SKY="137;220;235"         # #89dceb
+SAPPHIRE="116;199;236"    # #74c7ec
 # Neutral
 TEXT="205;214;244"        # #cdd6f4
 SUBTEXT0="166;173;200"    # #a6adc8
@@ -31,27 +31,41 @@ OVERLAY0="108;112;134"    # #6c7086
 SURFACE0="49;50;68"       # #313244
 CRUST="17;17;27"          # #11111b
 
+# ── Segment color assignment (warm/cool alternation for max contrast) ──
+# Line 1: Mauve(purple) → Peach(orange) → Sky(light blue)
+# Line 2: Rosewater(pink) → Teal(cyan)
+# Line 3: Maroon(dusty red) → Sapphire(blue) → Flamingo(salmon)
+L1_A=$MAUVE;     L1_B=$PEACH;     L1_C=$SKY
+L2_A=$ROSEWATER; L2_B=$TEAL
+L3_A=$MAROON;    L3_B=$SAPPHIRE;  L3_C=$FLAMINGO
+
+# ── Powerline glyphs (UTF-8 byte escapes for portability) ──
+LC=$'\xee\x82\xb6'    #  U+E0B6 left rounded cap
+RC=$'\xee\x82\xb4'    #  U+E0B4 right rounded cap
+AR=$'\xee\x82\xb0'    #  U+E0B0 left pointed arrow
+
 # ── Powerline helpers ──
-cap_left()  { printf "\033[38;2;%sm\033[0m" "$1"; }
-cap_right() { printf "\033[38;2;%sm\033[0m" "$1"; }
-arrow()     { printf "\033[48;2;%sm\033[38;2;%sm\033[0m" "$2" "$1"; }
+cap_left()  { printf "\033[38;2;%sm%s\033[0m" "$1" "$LC"; }
+cap_right() { printf "\033[38;2;%sm%s\033[0m" "$1" "$RC"; }
+arrow()     { printf "\033[48;2;%sm\033[38;2;%sm%s\033[0m" "$2" "$1" "$AR"; }
 seg()       { printf "\033[48;2;%sm\033[38;2;%sm %s \033[0m" "$1" "$2" "$3"; }
 fg()        { printf "\033[38;2;%sm%s\033[0m" "$1" "$2"; }
 
-# ── Folder icon substitution (Starship-inspired) ──
+# ── Folder icon substitution (Nerd Fonts — Maple Mono SC NF) ──
 folder_icon() {
   case "$1" in
     Documents|documents) printf '󰈙 ' ;;
-    Downloads|downloads) printf ' ' ;;
-    Desktop|desktop)     printf ' ' ;;
+    Downloads|downloads) printf ' ' ;;
+    Desktop|desktop)     printf ' ' ;;
     workspace)           printf ' ' ;;
     Developer|developer) printf '󰲋 ' ;;
-    Pictures|pictures)   printf ' ' ;;
+    Pictures|pictures)   printf ' ' ;;
     Music|music)         printf '󰝚 ' ;;
-    Movies|movies)       printf ' ' ;;
+    Movies|movies)       printf ' ' ;;
     *)                   return 1 ;;
   esac
 }
+
 fmt_folder() {
   local icon name=$1
   icon=$(folder_icon "$name")
@@ -60,6 +74,20 @@ fmt_folder() {
   else
     printf '%s' "$name"
   fi
+}
+
+# Apply icons to each directory name in a full path
+iconify_path() {
+  local p="$1"
+  p="${p//Documents/󰈙 Documents}"
+  p="${p//workspace/ workspace}"
+  p="${p//Downloads/ Downloads}"
+  p="${p//Desktop/ Desktop}"
+  p="${p//Developer/󰲋 Developer}"
+  p="${p//Pictures/ Pictures}"
+  p="${p//Music/󰝚 Music}"
+  p="${p//Movies/ Movies}"
+  echo "$p"
 }
 
 # ── Data extraction ──
@@ -91,87 +119,88 @@ out_fmt=$(format_tokens "$total_out")
 
 # ═══════════════════════════════════════════════════════════════════
 # Line 1: model | folder | added-dirs
-#   Palette: Rosewater → Flamingo → Pink
+#   Palette: Mauve(purple) → Peach(orange) → Sky(light blue)
 # ═══════════════════════════════════════════════════════════════════
 
 folder_display=$(fmt_folder "$folder")
 
-cap_left "$ROSEWATER"
-seg "$ROSEWATER" "$CRUST" "$model_id"
+cap_left "$L1_A"
+seg "$L1_A" "$CRUST" "$model_id"
 
 if [ -n "$added_dirs" ]; then
-  arrow "$ROSEWATER" "$FLAMINGO"
-  seg "$FLAMINGO" "$CRUST" "$folder_display"
-  arrow "$FLAMINGO" "$PINK"
-  seg "$PINK" "$CRUST" "$added_dirs"
-  cap_right "$PINK"
+  arrow "$L1_A" "$L1_B"
+  seg "$L1_B" "$CRUST" "$folder_display"
+  arrow "$L1_B" "$L1_C"
+  seg "$L1_C" "$CRUST" "$added_dirs"
+  cap_right "$L1_C"
 else
-  arrow "$ROSEWATER" "$FLAMINGO"
-  seg "$FLAMINGO" "$CRUST" "$folder_display"
-  cap_right "$FLAMINGO"
+  arrow "$L1_A" "$L1_B"
+  seg "$L1_B" "$CRUST" "$folder_display"
+  cap_right "$L1_B"
 fi
 printf "\n\n\n"
 
 # ═══════════════════════════════════════════════════════════════════
 # Line 2: agent (conditional) | cwd full path
-#   Palette: Maroon → Peach
+#   Palette: Rosewater(pink) → Teal(cyan)
 # ═══════════════════════════════════════════════════════════════════
 
 simplified_cwd=$(echo "$cwd" | sed "s|^$HOME|~|")
+iconified_cwd=$(iconify_path "$simplified_cwd")
 
 if [ -n "$agent_name" ]; then
   agent_label="$agent_name"
   [ -n "$agent_type" ] && agent_label="$agent_name ($agent_type)"
 
-  cap_left "$MAROON"
-  seg "$MAROON" "$CRUST" "$agent_label"
-  arrow "$MAROON" "$PEACH"
-  seg "$PEACH" "$CRUST" "$simplified_cwd"
-  cap_right "$PEACH"
+  cap_left "$L2_A"
+  seg "$L2_A" "$CRUST" "$agent_label"
+  arrow "$L2_A" "$L2_B"
+  seg "$L2_B" "$CRUST" "$iconified_cwd"
+  cap_right "$L2_B"
 else
-  cap_left "$PEACH"
-  seg "$PEACH" "$CRUST" "$simplified_cwd"
-  cap_right "$PEACH"
+  cap_left "$L2_B"
+  seg "$L2_B" "$CRUST" "$iconified_cwd"
+  cap_right "$L2_B"
 fi
 printf "\n\n\n"
 
 # ═══════════════════════════════════════════════════════════════════
 # Line 3: session-id | session-name | worktree
-#   Palette: Teal → Sky → Sapphire
+#   Palette: Maroon(dusty red) → Sapphire(blue) → Flamingo(salmon)
 # ═══════════════════════════════════════════════════════════════════
 
 parts=""
 last_bg=""
 
 if [ -n "$session_id" ]; then
-  cap_left "$TEAL"
-  seg "$TEAL" "$CRUST" "$session_id"
-  last_bg="$TEAL"
+  cap_left "$L3_A"
+  seg "$L3_A" "$CRUST" "$session_id"
+  last_bg="$L3_A"
   parts=1
 fi
 
 if [ -n "$session_name" ]; then
   if [ -z "$parts" ]; then
-    cap_left "$SKY"
-    seg "$SKY" "$CRUST" "$session_name"
-    last_bg="$SKY"
+    cap_left "$L3_B"
+    seg "$L3_B" "$CRUST" "$session_name"
+    last_bg="$L3_B"
   else
-    arrow "$last_bg" "$SKY"
-    seg "$SKY" "$CRUST" "$session_name"
-    last_bg="$SKY"
+    arrow "$last_bg" "$L3_B"
+    seg "$L3_B" "$CRUST" "$session_name"
+    last_bg="$L3_B"
   fi
   parts=1
 fi
 
 if [ -n "$worktree_name" ]; then
   if [ -z "$parts" ]; then
-    cap_left "$SAPPHIRE"
-    seg "$SAPPHIRE" "$CRUST" "wt:$worktree_name"
-    last_bg="$SAPPHIRE"
+    cap_left "$L3_C"
+    seg "$L3_C" "$CRUST" "wt:$worktree_name"
+    last_bg="$L3_C"
   else
-    arrow "$last_bg" "$SAPPHIRE"
-    seg "$SAPPHIRE" "$CRUST" "wt:$worktree_name"
-    last_bg="$SAPPHIRE"
+    arrow "$last_bg" "$L3_C"
+    seg "$L3_C" "$CRUST" "wt:$worktree_name"
+    last_bg="$L3_C"
   fi
   parts=1
 fi
@@ -203,7 +232,7 @@ if [ -n "$used_pct" ]; then
 
   printf "%s" "$(fg "$bar_color" "[${bar}]")"
   printf " %s" "$(printf '%5.1f%%' "$used_pct")"
-  printf "  %s %s  %s %s" "in" "$(fg "$TEAL" "$in_fmt")" "out" "$(fg "$SKY" "$out_fmt")"
+  printf "  %s %s  %s %s" "in" "$(fg "$MAUVE" "$in_fmt")" "out" "$(fg "$PEACH" "$out_fmt")"
 else
   printf "%s" "$(fg "$OVERLAY0" "[no context]")"
 fi

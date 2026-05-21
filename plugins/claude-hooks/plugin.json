@@ -1,7 +1,7 @@
 {
   "name": "claude-hooks",
   "description": "用户级 hooks：oxlint 类型偷懒断言门禁 + token 消耗记录",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "author": {
     "name": "Jacob Zhang"
   }
