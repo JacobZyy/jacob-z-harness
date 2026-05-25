@@ -87,23 +87,35 @@ function extractUserMsg(content: unknown): string {
 }
 
 async function main(): Promise<void> {
+  log.info('hook triggered — starting turn usage recording');
+
   let raw = '';
   try {
     raw = readFileSync(0, 'utf8');
   } catch {
+    log.warn('stdin read failed, exiting');
     silentExit();
   }
-  if (!raw.trim()) silentExit();
+  if (!raw.trim()) {
+    log.info('stdin empty, exiting');
+    silentExit();
+  }
 
   let input: StopHookInput;
   try {
     input = JSON.parse(raw) as StopHookInput;
   } catch {
+    log.warn('stdin JSON parse failed, exiting');
     silentExit();
   }
 
+  log.info(`input received: transcript_path=${input.transcript_path ?? 'N/A'}, session_id=${input.session_id ?? 'N/A'}`);
+
   const transcriptPath = input.transcript_path;
-  if (!transcriptPath) silentExit();
+  if (!transcriptPath) {
+    log.info('no transcript_path, exiting');
+    silentExit();
+  }
 
   let transcript: string;
   try {

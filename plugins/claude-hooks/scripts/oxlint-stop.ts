@@ -66,33 +66,52 @@ function silentExit(): never {
 
 // ── 主流程 ─────────────────────────────────────────────────────────────────
 function main(): void {
+  log.info('hook triggered — starting oxlint type assertion check');
+
   // 1. 读取 stdin
   let raw = '';
   try {
     raw = readFileSync(0, 'utf8');
   } catch {
+    log.warn('stdin read failed, exiting');
     silentExit();
   }
-  if (!raw.trim()) silentExit();
+  if (!raw.trim()) {
+    log.info('stdin empty, exiting');
+    silentExit();
+  }
 
   let input: StopHookInput = {};
   try {
     input = JSON.parse(raw) as StopHookInput;
   } catch {
+    log.warn('stdin JSON parse failed, exiting');
     silentExit();
   }
 
+  log.info(`input received: transcript_path=${input.transcript_path ?? 'N/A'}, stop_hook_active=${input.stop_hook_active ?? false}`);
+
   const transcriptPath = input.transcript_path;
-  if (!transcriptPath || !existsSync(transcriptPath)) silentExit();
+  if (!transcriptPath || !existsSync(transcriptPath)) {
+    log.info('no valid transcript_path, exiting', `transcript_path=${transcriptPath}`);
+    silentExit();
+  }
 
   const stopHookActive = input.stop_hook_active === true;
 
   // 2. 规则文件存在性
-  if (!existsSync(OXLINT_CFG)) silentExit();
+  if (!existsSync(OXLINT_CFG)) {
+    log.info(`oxlintrc not found at ${OXLINT_CFG}, exiting`);
+    silentExit();
+  }
 
   // 3. 从 transcript 提取本会话 Edit/Write/MultiEdit 触达的 TS 文件
   const allFiles = extractEditedFiles(transcriptPath);
-  if (allFiles.length === 0) silentExit();
+  log.info(`extracted ${allFiles.length} edited TS files from transcript`);
+  if (allFiles.length === 0) {
+    log.info('no edited TS files, exiting');
+    silentExit();
+  }
 
   // 3.5 按 oxlintrc.ignorePatterns 在 hook 层过滤
   // 原因：oxlint 在"显式传文件清单"模式下不会应用 ignorePatterns，
@@ -100,13 +119,16 @@ function main(): void {
   const ignorePatterns = loadIgnorePatterns(OXLINT_CFG);
   const files = filterByIgnorePatterns(allFiles, ignorePatterns);
   const skippedCount = allFiles.length - files.length;
+  log.info(`after ignore filter: ${files.length} files to lint, ${skippedCount} skipped`, `ignorePatterns=${ignorePatterns.join(',')}`);
   if (files.length === 0) {
+    log.done(`no files to lint (${allFiles.length} all matched ignore rules)`, 'info');
     emit({
       systemMessage: `✅ [oxlint] 无需检查（${allFiles.length} 个 TS 文件全部命中忽略规则）`,
     });
   }
 
   // 4. 跑 oxlint
+  log.info(`running oxlint on ${files.length} files: ${files.join(', ')}`);
   const oxlint = spawnSync('oxlint', ['-c', OXLINT_CFG, ...files], {
     encoding: 'utf8',
     // 合并 stderr 到 stdout，便于把完整报告塞回 Claude

@@ -79,14 +79,14 @@ fmt_folder() {
 # Apply icons to each directory name in a full path
 iconify_path() {
   local p="$1"
-  p="${p//Documents/󰈙 Documents}"
-  p="${p//workspace/ workspace}"
-  p="${p//Downloads/ Downloads}"
-  p="${p//Desktop/ Desktop}"
-  p="${p//Developer/󰲋 Developer}"
-  p="${p//Pictures/ Pictures}"
-  p="${p//Music/󰝚 Music}"
-  p="${p//Movies/ Movies}"
+  p="${p//Documents/󰈙}"
+  p="${p//workspace/}"
+  p="${p//Downloads/}"
+  p="${p//Desktop/}"
+  p="${p//Developer/󰲋}"
+  p="${p//Pictures/}"
+  p="${p//Music/󰝚}"
+  p="${p//Movies/}"
   echo "$p"
 }
 

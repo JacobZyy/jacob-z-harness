@@ -57,23 +57,35 @@ function fmtToolLabel(name: string, input?: Record<string, unknown>): string {
 }
 
 async function main(): Promise<void> {
+  log.info('hook triggered — starting tool call token recording');
+
   let raw = '';
   try {
     raw = readFileSync(0, 'utf8');
   } catch {
+    log.warn('stdin read failed, exiting');
     silentExit();
   }
-  if (!raw.trim()) silentExit();
+  if (!raw.trim()) {
+    log.info('stdin empty, exiting');
+    silentExit();
+  }
 
   let input: PostToolUseInput;
   try {
     input = JSON.parse(raw) as PostToolUseInput;
   } catch {
+    log.warn('stdin JSON parse failed, exiting');
     silentExit();
   }
 
   const toolName = input.tool_name;
-  if (!toolName) silentExit();
+  if (!toolName) {
+    log.info('no tool_name in input, exiting');
+    silentExit();
+  }
+
+  log.info(`input received: tool_name=${toolName}, session_id=${input.session_id ?? 'N/A'}`);
 
   // 跳过内部/noise 工具
   const SKIP_TOOLS = new Set(['Read', 'TaskCreate', 'TaskUpdate', 'TaskGet', 'TaskList']);
