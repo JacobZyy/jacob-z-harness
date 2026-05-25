@@ -9,10 +9,10 @@
     {
       "name": "claude-hooks",
       "source": "./plugins/claude-hooks",
-      "description": "用户级 hooks：oxlint 类型偷懒断言门禁 + token 消耗记录",
-      "version": "1.6.0",
+      "description": "用户级 hooks：oxlint 类型偷懒断言门禁 + 嵌套复杂度检测 + ESLint 自动修复 + token 消耗记录",
+      "version": "1.7.0",
       "category": "devtools",
-      "tags": ["lint", "oxlint", "token-stats", "hooks"]
+      "tags": ["lint", "oxlint", "complexity", "eslint", "token-stats", "hooks"]
     }
   ]
 }
