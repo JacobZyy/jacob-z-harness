@@ -1,7 +1,8 @@
 /**
  * Claude Code Stop hook: 用本机用户级 oxlint 拦截类型偷懒断言。
  *
- * 仅 lint 本会话 Edit/Write/MultiEdit 触达的 .ts/.tsx/.mts/.cts 文件。
+ * 仅 lint 本会话 Edit/Write/MultiEdit 触达的 .ts/.tsx/.mts/.cts/.vue 文件。
+ * 注意：oxlint 对 .vue 文件仅 lint <script> 块，不支持 <template>/<style>。
  * 规则文件: ~/.config/oxlint/oxlintrc.json （与项目级 eslint 完全解耦）
  * 设计文档: ~/.omc/specs/deep-interview-oxlint-stop-hook.md
  *
@@ -51,7 +52,7 @@ interface OxlintConfig {
   ignorePatterns?: string[];
 }
 
-const TS_EXTENSIONS = /\.(ts|tsx|mts|cts)$/;
+const TS_EXTENSIONS = /\.(ts|tsx|mts|cts|vue)$/;
 const OXLINT_CFG = join(homedir(), '.config', 'oxlint', 'oxlintrc.json');
 
 // ── 输出辅助 ───────────────────────────────────────────────────────────────
@@ -107,9 +108,9 @@ function main(): void {
 
   // 3. 从 transcript 提取本会话 Edit/Write/MultiEdit 触达的 TS 文件
   const allFiles = extractEditedFiles(transcriptPath);
-  log.info(`extracted ${allFiles.length} edited TS files from transcript`);
+  log.info(`extracted ${allFiles.length} edited TS/Vue files from transcript`);
   if (allFiles.length === 0) {
-    log.info('no edited TS files, exiting');
+    log.info('no edited TS/Vue files, exiting');
     silentExit();
   }
 
@@ -123,7 +124,7 @@ function main(): void {
   if (files.length === 0) {
     log.done(`no files to lint (${allFiles.length} all matched ignore rules)`, 'info');
     emit({
-      systemMessage: `✅ [oxlint] 无需检查（${allFiles.length} 个 TS 文件全部命中忽略规则）`,
+      systemMessage: `✅ [oxlint] 无需检查（${allFiles.length} 个 TS/Vue 文件全部命中忽略规则）`,
     });
   }
 
@@ -150,9 +151,9 @@ function main(): void {
 
   switch (exitCode) {
     case 0:
-      log.done(`passed (${fileCount} TS files, 0 violations)`);
+      log.done(`passed (${fileCount} TS/Vue files, 0 violations)`);
       emit({
-        systemMessage: `✅ [oxlint] 类型偷懒断言检查通过（${fileCount} 个 TS 文件${skipNote}，0 违规）`,
+        systemMessage: `✅ [oxlint] 类型偷懒断言检查通过（${fileCount} 个 TS/Vue 文件${skipNote}，0 违规）`,
       });
       break;
 
@@ -163,10 +164,10 @@ function main(): void {
         .reverse()
         .find((l) => /Found .* errors?\./.test(l));
       const summary = errorLine
-        ? `❌ [oxlint] 检测到类型偷懒断言 — ${errorLine} 共扫描 ${fileCount} 个 TS 文件${skipNote}`
-        : `❌ [oxlint] 检测到类型偷懒断言（${fileCount} 个 TS 文件${skipNote}）`;
+        ? `❌ [oxlint] 检测到类型偷懒断言 — ${errorLine} 共扫描 ${fileCount} 个 TS/Vue 文件${skipNote}`
+        : `❌ [oxlint] 检测到类型偷懒断言（${fileCount} 个 TS/Vue 文件${skipNote}）`;
 
-      log.done(`violations found (${fileCount} TS files)`, 'warn', oxlintOut.slice(0, 500));
+      log.done(`violations found (${fileCount} TS/Vue files)`, 'warn', oxlintOut.slice(0, 500));
 
       if (stopHookActive) {
         emit({
