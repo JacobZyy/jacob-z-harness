@@ -1,5 +1,7 @@
 .omc/
+.omo/
 node_modules/
+coverage/
 *.log
 .DS_Store
 __pycache__/

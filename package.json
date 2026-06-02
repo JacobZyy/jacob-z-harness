@@ -2,6 +2,7 @@
   "name": "jacob-skills-collection",
   "type": "module",
   "version": "1.0.0",
+  "packageManager": "pnpm@9.15.9+sha512.68046141893c66fad01c079231128e9afb89ef87e2691d69e4d40eee228988295fd4682181bae55b58418c3a253bde65a505ec7c5f9403ece5cc3cd37dcf2531",
   "description": "",
   "author": "",
   "license": "ISC",
@@ -10,15 +11,19 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^8.2.0",
     "@eslint-react/eslint-plugin": "^3.0.0",
+    "@opencode-ai/plugin": "^1.15.10",
+    "@vitest/coverage-v8": "^4.1.7",
     "eslint": "^10.2.1",
     "eslint-plugin-format": "^2.0.1",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.2"
-  },
-  "packageManager": "pnpm@9.15.9+sha512.68046141893c66fad01c079231128e9afb89ef87e2691d69e4d40eee228988295fd4682181bae55b58418c3a253bde65a505ec7c5f9403ece5cc3cd37dcf2531"
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "vitest": "^4.1.7"
+  }
 }
