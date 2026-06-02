@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-个人 AI 相关工具合集仓库。收集和整理个人开发的 AI 工具、脚本和配置。
+个人 Claude Code / oh-my-pi 工具集仓库。收集和整理个人开发的 AI 代码 agent 工具、脚本和配置。
 
-- 仓库: GitHub `https://github.com/JacobZyy/jacob-skills-collection`
+- 仓库: GitHub `https://github.com/JacobZyy/jacob-z-harness`
 - 包管理: pnpm
 - 类型: ESM (`"type": "module"`)
 
@@ -39,15 +39,18 @@ git push origin main
 ## Project Structure
 
 ```
-marketplace.json   # Claude Code 插件市场声明
-plugins/           # Claude Code 插件
-  claude-hooks/    # oxlint 门禁 + token 消耗记录
-skills/            # AI 相关 skills（持续补充中）
-eslint.config.js   # ESLint 配置 (ESM)
+.claude-plugin/         # Marketplace 声明
+  marketplace.json
+plugins/                # 插件
+  claude-hooks/         # oxlint 门禁 + token 消耗记录
+  hyperpiemia/          # oh-my-pi skills（vitest、whistle、zapi）
+packages/               # 子项目
+eslint.config.js        # ESLint 配置 (ESM)
+vitest.config.ts        # Vitest 测试配置
 ```
 
 ## Notes
 
-- `.omc/` 和 `node_modules/` 在 `.gitignore` 中，不会被提交
+- `.omc/`、`.omo/`、`coverage/`、`node_modules/` 在 `.gitignore` 中，不会被提交
 - `.idea/` 目录包含 IntelliJ IDEA 配置，已纳入版本控制
-- 当前无测试框架，`pnpm test` 会报错退出
+- 测试框架: Vitest，运行 `pnpm test` 执行测试

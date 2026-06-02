@@ -1,19 +1,20 @@
-# jacob-skills-collection
+# jacob-z-harness
 
-个人 AI 相关工具合集仓库。
+个人 Claude Code / oh-my-pi 工具集仓库。
 
 ## 简介
 
-这是一个收集和整理我个人开发的 AI 相关工具、脚本和配置的仓库。
+收集和整理个人开发的 AI 代码 agent 工具、脚本和配置，以 marketplace 形式组织。
 
 ## 内容
 
-- `scripts/` — 实用脚本（GitLab 代理开关等）
-- `skills/` — AI 相关 skills（持续补充中）
+- `plugins/claude-hooks/` — Claude Code 用户级 hooks（oxlint 门禁、复杂度检测、ESLint 自动修复、token 统计）
+- `plugins/hyperpiemia/` — oh-my-pi 自建 skills（Vitest 测试框架、Whistle 代理调试、ZAPI 接口工具）
+- `packages/` — 子项目（ai-chat-viewer 等）
 
 ## 仓库配置
 
-- **GitHub（主仓库）**: `https://github.com/JacobZyy/jacob-skills-collection`
+- **GitHub（主仓库）**: `https://github.com/JacobZyy/jacob-z-harness`
   - `origin` 指向 GitHub
   - 普通 `git push` 只同步到 GitHub
 - **GitLab（公司备份）**: `https://gitlab.zhuanspirit.com/zhayang/jacob-open-source`
@@ -42,5 +43,5 @@ pnpm proxy:off
 ## 使用
 
 ```bash
-git clone https://github.com/JacobZyy/jacob-skills-collection.git
+git clone https://github.com/JacobZyy/jacob-z-harness.git
 ```

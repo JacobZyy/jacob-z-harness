@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "jacob-skills-collection",
+  "name": "jacob-z-harness",
   "description": "个人 Claude Code 工具集 — hooks、skills、配置",
   "owner": {
     "name": "Jacob Zhang"
@@ -13,6 +13,14 @@
       "version": "1.8.0",
       "category": "devtools",
       "tags": ["lint", "oxlint", "complexity", "eslint", "token-stats", "hooks"]
+    },
+    {
+      "name": "hyperpiemia",
+      "source": "./plugins/hyperpiemia",
+      "description": "oh-my-pi 自建 skills 集合：测试框架、Whistle 代理调试、ZAPI 接口工具",
+      "version": "0.1.0",
+      "category": "devtools",
+      "tags": ["vitest", "vue2", "whistle", "zapi", "mock", "skills"]
     }
   ]
 }
