@@ -4,20 +4,20 @@ Whistle 代理工具全套 AI 辅助 skills，覆盖从安装启动到高级插�
 
 ## 包含的 Skills
 
-| Skill | 用途 | 触发场景 |
-|-------|------|----------|
-| `whistle-quickstart` | 安装、启动、HTTPS 证书、移动端抓包 | 首次配置 Whistle、证书问题 |
-| `whistle-rules` | 规则语法结构、pattern 系统、过滤器 | 需要了解规则怎么写 |
-| `whistle-proxy` | Map Local/Remote、DNS 劫持、host/proxy | Mock 接口、本地开发、跨域调试 |
-| `whistle-rewrite` | 请求/响应改写、HTML/CSS/JS 注入、限速 | 修改请求头、注入脚本、弱网测试 |
-| `whistle-advanced` | 插件开发、CLI 参数、FAQ 排查 | 排查故障、开发插件 |
-| `whistle-rules-inject` | 将 AI 生成的规则注入本地 Whistle 配置 | 规则写好后需要生效 |
+| Skill                  | 用途                                   | 触发场景                       |
+| ---------------------- | -------------------------------------- | ------------------------------ |
+| `whistle-quickstart`   | 安装、启动、HTTPS 证书、移动端抓包     | 首次配置 Whistle、证书问题     |
+| `whistle-rules`        | 规则语法结构、pattern 系统、过滤器     | 需要了解规则怎么写             |
+| `whistle-proxy`        | Map Local/Remote、DNS 劫持、host/proxy | Mock 接口、本地开发、跨域调试  |
+| `whistle-rewrite`      | 请求/响应改写、HTML/CSS/JS 注入、限速  | 修改请求头、注入脚本、弱网测试 |
+| `whistle-advanced`     | 插件开发、CLI 参数、FAQ 排查           | 排查故障、开发插件             |
+| `whistle-rules-inject` | 将 AI 生成的规则注入本地 Whistle 配置  | 规则写好后需要生效             |
 
 ## 依赖
 
 - **所有 skill**：需要 AI 助手支持 skill 系统（Claude Code / Codex / Gemini CLI / cc-switch）
 - **whistle-rules-inject**：额外需要 Python 3（运行注入脚本）
-- **whistle-* 功能**：需要本地已安装 Whistle（参考 whistle-quickstart 安装）
+- **whistle-\* 功能**：需要本地已安装 Whistle（参考 whistle-quickstart 安装）
 
 ## 快速安装
 

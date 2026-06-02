@@ -31,15 +31,15 @@ Capture the JSON. Do NOT use Read/Grep/Glob to scan the project yourself — tha
 
 Based on the JSON, conditionally Read these references:
 
-| Profile field | Trigger | Reference to load |
-|---------------|---------|-------------------|
-| `vueMajorMinor === "2.6"` | always | `references/option-vue26.md` |
-| `hasCompositionApi === true` | only if 2.6 | `references/option-vue26.md` |
-| `stateManagement` includes `vuex` | `"vuex"` or `"both"` | `references/option-vuex.md` |
-| `syntaxStyles.tsx > 0` | always | `references/option-tsx-jsx.md` |
-| `syntaxStyles.classComponent > 0` | always | `references/option-class-component.md` |
-| `privateDeps` non-empty | always | `references/private-deps-mock-catalog.md` |
-| `cdnDomains` non-empty | always | `references/cdn-and-async-noise.md` |
+| Profile field                     | Trigger              | Reference to load                         |
+| --------------------------------- | -------------------- | ----------------------------------------- |
+| `vueMajorMinor === "2.6"`         | always               | `references/option-vue26.md`              |
+| `hasCompositionApi === true`      | only if 2.6          | `references/option-vue26.md`              |
+| `stateManagement` includes `vuex` | `"vuex"` or `"both"` | `references/option-vuex.md`               |
+| `syntaxStyles.tsx > 0`            | always               | `references/option-tsx-jsx.md`            |
+| `syntaxStyles.classComponent > 0` | always               | `references/option-class-component.md`    |
+| `privateDeps` non-empty           | always               | `references/private-deps-mock-catalog.md` |
+| `cdnDomains` non-empty            | always               | `references/cdn-and-async-noise.md`       |
 
 The mainline (Vue 2.7 + composition + pinia + private-dep mocks) is the default — no reference needed if profile matches it cleanly.
 
@@ -48,23 +48,28 @@ The mainline (Vue 2.7 + composition + pinia + private-dep mocks) is the default 
 These five questions came from the project lead's bootstrap brief. Do not skip them — they expose project-specific constraints that the JSON cannot tell you. Where the JSON has already settled a sub-question, state the JSON answer and ask only the remaining piece.
 
 **Q1 — Versions**
+
 - State from JSON: vue=`{vueVersion}`, hasCompositionApi=`{bool}`, stateManagement=`{...}`.
 - Ask the user: "Is Vitest 4.x acceptable? Any version pins I should respect from your team's standards (e.g. happy-dom version, @vue/test-utils 1.x specifically)?"
 
 **Q2 — File-type scope**
+
 - State from JSON: SFC counts by style (`scriptSetup={n}, defineComponent={n}, classComponent={n}, tsx={n}, templateOnly={n}`).
 - Confirm with the user: "Are all of these in scope for tests, or should we exclude TSX/class for now?"
 
 **Q3 — Private dependencies**
+
 - State from JSON: `privateDeps` list with import counts.
 - For each entry NOT in `references/private-deps-mock-catalog.md`, ask: "How should this be mocked? Stub returning `vi.fn()` or do you have specific behavior requirements?"
 
 **Q4 — CDN static files**
+
 - State from JSON: `cdnDomains` with counts.
 - If only template/CSS-string references → state "These are harmless — happy-dom does not fire image requests."
 - If any `fetch(cdnUrl)` exists in source → ask: "Should we install a global `fetch` mock returning a default OK response, or mock per-test?"
 
 **Q5 — API request contracts**
+
 - Ask: "Are most APIs ready with TS types? If not, do you want me to use minimal-shape placeholders with `// @todo` markers, or pause and ask per-API?"
 - Ask: "Do you have a `mock.local` or similar gitignored mock-data dir? If yes, should the test setup pick it up?"
 
@@ -110,25 +115,25 @@ Highlight any package that was found by the scan but not present in the mainline
 
 ## Boundary with `vitest-vue2-testing`
 
-| | This skill (`vitest-vue2-init`) | `vitest-vue2-testing` |
-|---|---|---|
-| Trigger | No `vitest.config.*` exists | Test infrastructure already in place |
-| Frequency | Once per repo | Daily |
-| Outputs | Config + setup + sample tests + scan report | Test files + mock adjustments + noise diagnosis |
-| Detection method | `scripts/detect-stack.mjs` (zero token) | Read existing `setup.ts` |
+|                  | This skill (`vitest-vue2-init`)             | `vitest-vue2-testing`                           |
+| ---------------- | ------------------------------------------- | ----------------------------------------------- |
+| Trigger          | No `vitest.config.*` exists                 | Test infrastructure already in place            |
+| Frequency        | Once per repo                               | Daily                                           |
+| Outputs          | Config + setup + sample tests + scan report | Test files + mock adjustments + noise diagnosis |
+| Detection method | `scripts/detect-stack.mjs` (zero token)     | Read existing `setup.ts`                        |
 
 Always end this skill with a one-liner: "Framework ready. For test authoring, the skill `vitest-vue2-testing` takes over from here."
 
 ## References (loaded on demand based on Step 2)
 
-| File | Trigger |
-|------|---------|
-| `references/option-vue26.md` | Vue 2.6 + composition-api adaptation |
-| `references/option-vuex.md` | Vuex testing patterns (alone or with pinia) |
-| `references/option-tsx-jsx.md` | `@vitejs/plugin-vue2-jsx` integration |
-| `references/option-class-component.md` | Babel decorator setup for `vue-class-component` |
-| `references/private-deps-mock-catalog.md` | Full @zz-* mock recipes |
-| `references/cdn-and-async-noise.md` | CDN fetch mocks and known residual SDK noise |
+| File                                      | Trigger                                         |
+| ----------------------------------------- | ----------------------------------------------- |
+| `references/option-vue26.md`              | Vue 2.6 + composition-api adaptation            |
+| `references/option-vuex.md`               | Vuex testing patterns (alone or with pinia)     |
+| `references/option-tsx-jsx.md`            | `@vitejs/plugin-vue2-jsx` integration           |
+| `references/option-class-component.md`    | Babel decorator setup for `vue-class-component` |
+| `references/private-deps-mock-catalog.md` | Full @zz-\* mock recipes                        |
+| `references/cdn-and-async-noise.md`       | CDN fetch mocks and known residual SDK noise    |
 
 ## What you must NOT do
 

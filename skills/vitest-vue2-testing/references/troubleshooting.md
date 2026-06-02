@@ -77,12 +77,12 @@ pnpm hoists multiple lego copies (e.g. `@zz-common+lego@6.4.7` for direct usage,
 
 Each of these was tried and either failed or made things worse:
 
-| Approach | Why it fails |
-|----------|--------------|
-| Monkey-patch `HTMLScriptElement.prototype.src` setter | happy-dom uses a private `#loadScript` method that bypasses the public setter |
+| Approach                                                                        | Why it fails                                                                                                                       |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Monkey-patch `HTMLScriptElement.prototype.src` setter                           | happy-dom uses a private `#loadScript` method that bypasses the public setter                                                      |
 | `environmentOptions.happyDOM.settings.handleDisabledFileLoadingAsSuccess: true` | Forces a `load` event to dispatch, which then sends the SDK down a code path happy-dom doesn't support — adds 8+ new Error entries |
-| `test.onConsoleLog` | The stderr writes come from happy-dom's internal virtual console, not from the test runner's console capture |
-| `vi.mock('@zz-common/lego/lib/lego-pagelife', ...)` | Transitive code does `require('./lego-pagelife')` from inside the package — a relative path that never sees Vitest's resolver |
+| `test.onConsoleLog`                                                             | The stderr writes come from happy-dom's internal virtual console, not from the test runner's console capture                       |
+| `vi.mock('@zz-common/lego/lib/lego-pagelife', ...)`                             | Transitive code does `require('./lego-pagelife')` from inside the package — a relative path that never sees Vitest's resolver      |
 
 ### The one option that does work (but costs startup time)
 

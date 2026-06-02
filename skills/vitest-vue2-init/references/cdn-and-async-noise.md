@@ -57,12 +57,12 @@ pnpm hoists multiple versions of a package (e.g. `@zz-common+lego@6.4.7` and `@z
 
 ### What does NOT work (verified failures)
 
-| Approach | Why it fails |
-|----------|--------------|
-| Monkey-patching `HTMLScriptElement.prototype.src` setter | happy-dom uses a private `#loadScript` that bypasses the setter |
+| Approach                                                                        | Why it fails                                                                                                         |
+| ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Monkey-patching `HTMLScriptElement.prototype.src` setter                        | happy-dom uses a private `#loadScript` that bypasses the setter                                                      |
 | `environmentOptions.happyDOM.settings.handleDisabledFileLoadingAsSuccess: true` | Dispatches a `load` event that drives the SDK into code paths happy-dom doesn't support — produces NEW Error entries |
-| `test.onConsoleLog` filter | Writes come from happy-dom's internal virtual console, not the test runner's console capture |
-| `vi.mock('@zz-common/lego/lib/lego-pagelife', ...)` | Transitive code uses `require('./lego-pagelife')` (relative); never goes through Vitest's resolver |
+| `test.onConsoleLog` filter                                                      | Writes come from happy-dom's internal virtual console, not the test runner's console capture                         |
+| `vi.mock('@zz-common/lego/lib/lego-pagelife', ...)`                             | Transitive code uses `require('./lego-pagelife')` (relative); never goes through Vitest's resolver                   |
 
 ### What DOES work (at a cost)
 
@@ -87,10 +87,10 @@ This forces Vitest to inline-bundle the listed packages into the worker, after w
 
 ## Decision matrix
 
-| Situation | Action |
-|-----------|--------|
-| `cdnDomains` empty, no `fetch(cdnUrl)` calls | Do nothing |
-| `cdnDomains` non-empty but only in templates/CSS strings | Do nothing |
-| `fetch(cdnUrl)` calls exist | Install `global.fetch` mock in setup.ts |
-| Residual `DOMException` noise after complete mocks | Accept it OR enable `server.deps.inline` |
-| Tests timeout because real fetch hangs | Mandatory `global.fetch` mock |
+| Situation                                                | Action                                   |
+| -------------------------------------------------------- | ---------------------------------------- |
+| `cdnDomains` empty, no `fetch(cdnUrl)` calls             | Do nothing                               |
+| `cdnDomains` non-empty but only in templates/CSS strings | Do nothing                               |
+| `fetch(cdnUrl)` calls exist                              | Install `global.fetch` mock in setup.ts  |
+| Residual `DOMException` noise after complete mocks       | Accept it OR enable `server.deps.inline` |
+| Tests timeout because real fetch hangs                   | Mandatory `global.fetch` mock            |

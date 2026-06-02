@@ -10,6 +10,7 @@ description: 解析 ZAPI 接口文档，自动生成 TypeScript 类型定义和�
 ## 触发条件
 
 满足以下任一条件即使用本技能：
+
 - 用户提供了 `zapi.zhuanspirit.com` 的接口 URL
 - 用户要求根据 ZAPI 接口生成 TypeScript 类型或接口实现
 - 用户提到"zapi 接口"、"接口类型生成"等关键词
@@ -42,9 +43,11 @@ description: 解析 ZAPI 接口文档，自动生成 TypeScript 类型定义和�
 根据当前页面文件夹和项目类型确定输出位置：
 
 **类型文件位置**：始终放在当前页面文件夹下的 `type.ts`
+
 - 例：页面在 `@src/views/xxxPages/handler/` → 类型放 `@src/views/xxxPages/handler/type.ts`
 
 **接口实现文件位置**：
+
 - **Vue 项目**：放在 `@src/api/{页面文件夹名}.ts`
   - 例：页面文件夹为 `cabinetPriceHandler` → `@src/api/cabinetPriceHandler.ts`
 - **React 项目**：放在当前页面文件夹下的 `service.ts`
@@ -55,6 +58,7 @@ description: 解析 ZAPI 接口文档，自动生成 TypeScript 类型定义和�
 ### Step 4：生成类型定义
 
 规则：
+
 1. **扁平化类型**：尽量不用嵌套类型（内联对象），如果嵌套对象有明确语义，提取为独立 interface/type
 2. **只解析 respData**：返回值类型不包含通用结构（`errorMsg`、`respCode`、`respData` 包装层），直接定义 `respData` 内部的结构
 3. **命名规范**：
@@ -67,6 +71,7 @@ description: 解析 ZAPI 接口文档，自动生成 TypeScript 类型定义和�
 ### Step 5：生成接口实现
 
 规则：
+
 1. **请求工具**：优先使用项目 `@src/utils/` 下的 `http` 或 `request` 文件导出的请求方法
    - 检查 `@src/utils/http.*` 或 `@src/utils/request.*` 是否存在
    - 使用其导出的 `post`/`get` 等方法
@@ -96,6 +101,7 @@ description: 解析 ZAPI 接口文档，自动生成 TypeScript 类型定义和�
 ## 输出示例
 
 ### type.ts（追加内容）
+
 ```typescript
 /**
  * 获取价格弹窗请求参数
@@ -117,6 +123,7 @@ export interface GetPricePopInfoRes {
 ```
 
 ### api 文件（追加内容）
+
 ```typescript
 import type { GetPricePopInfoReq, GetPricePopInfoRes } from '@/views/xxxPages/handler/type'
 

@@ -10,11 +10,11 @@
 
 ## 触发时机
 
-| 场景 | 应该走的 skill |
-|------|---------------|
-| 项目根目录**没有** `vitest.config.*`，准备从零搭建单测能力 | `vitest-vue2-init`（本 skill） |
-| 项目已有 `tests/unit/setup.ts`，要写新测试 / 修 mock / 排查噪声 | `vitest-vue2-testing` |
-| 接到任意 `.test.ts` 报错 | `vitest-vue2-testing` |
+| 场景                                                            | 应该走的 skill                 |
+| --------------------------------------------------------------- | ------------------------------ |
+| 项目根目录**没有** `vitest.config.*`，准备从零搭建单测能力      | `vitest-vue2-init`（本 skill） |
+| 项目已有 `tests/unit/setup.ts`，要写新测试 / 修 mock / 排查噪声 | `vitest-vue2-testing`          |
+| 接到任意 `.test.ts` 报错                                        | `vitest-vue2-testing`          |
 
 如果你在 init 主入口看到"Preconditions"段说要 bail out，那就是触发场景错了，应该走 testing skill。
 
@@ -57,13 +57,13 @@ node $SKILL_DIR/scripts/detect-stack.mjs $PROJECT_ROOT
 
 探测脚本能告诉你"项目里有什么"，但告诉不了你"哪些在测试范围内 / 哪些 mock 要走特殊行为"。所以主入口在写文件**之前**强制 AI 走一遍 5 问：
 
-| 问题 | 解决什么 |
-|------|---------|
-| Q1 版本 | Vitest 4.x 是否可接受？团队有没有版本锁要遵守？ |
-| Q2 文件类型范围 | 探测到的所有写法是否都纳入测试范围？ |
-| Q3 私有依赖 | 不在 catalog 里的 `@zz-*` 包要怎么 mock？ |
+| 问题            | 解决什么                                           |
+| --------------- | -------------------------------------------------- |
+| Q1 版本         | Vitest 4.x 是否可接受？团队有没有版本锁要遵守？    |
+| Q2 文件类型范围 | 探测到的所有写法是否都纳入测试范围？               |
+| Q3 私有依赖     | 不在 catalog 里的 `@zz-*` 包要怎么 mock？          |
 | Q4 CDN 静态文件 | 仅模板字符串引用就够了吗？还是有 `fetch(cdnUrl)`？ |
-| Q5 接口契约 | API 是否就绪？有没有 `mock.local`？ |
+| Q5 接口契约     | API 是否就绪？有没有 `mock.local`？                |
 
 跳过 5 问会导致后续配置错误——这是踩过坑后总结的硬约束。
 
@@ -124,12 +124,12 @@ pnpm 可能锁出多份 `@zz-common/lego`（如 6.4.7 直依、6.4.9 由 sentry 
 
 ## 与 `vitest-vue2-testing` 的边界
 
-| | `vitest-vue2-init`（本 skill） | `vitest-vue2-testing` |
-|---|---|---|
-| 触发 | 项目无 `vitest.config.*` | 测试基础设施已就位 |
-| 频率 | 每仓库一次 | 高频日常 |
-| 入口动作 | Bash 跑 detect-stack | Read 已有 setup.ts |
-| 输出 | 框架配置 + 样例测试 + 扫描报告 | 测试用例 + mock 调整 + 噪声诊断 |
+|          | `vitest-vue2-init`（本 skill） | `vitest-vue2-testing`           |
+| -------- | ------------------------------ | ------------------------------- |
+| 触发     | 项目无 `vitest.config.*`       | 测试基础设施已就位              |
+| 频率     | 每仓库一次                     | 高频日常                        |
+| 入口动作 | Bash 跑 detect-stack           | Read 已有 setup.ts              |
+| 输出     | 框架配置 + 样例测试 + 扫描报告 | 测试用例 + mock 调整 + 噪声诊断 |
 
 init 完成后，AI 会显式提示："Framework ready. For test authoring, the skill `vitest-vue2-testing` takes over from here."
 
@@ -138,7 +138,7 @@ init 完成后，AI 会显式提示："Framework ready. For test authoring, the 
 - **必须保持 SKILL.md 全英文**——AI 读它时不应被混合语言干扰
 - 中文说明、设计取舍、踩坑记录全部放在本文件
 - 探测脚本 `scripts/detect-stack.mjs` 的注释可以保持英文，方便其他人读
-- references/*.md 也应保持英文（AI 按需加载，不要给它中英混合）
+- references/\*.md 也应保持英文（AI 按需加载，不要给它中英混合）
 
 ## 一句话总结
 

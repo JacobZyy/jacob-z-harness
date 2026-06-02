@@ -5,7 +5,7 @@ description: Whistle 请求/响应改写——修改 Headers、Body、StatusCode
 
 # Whistle 请求与响应改写
 
-本 skill 依赖 `whistle-rules` 中定义的规则语法、pattern 和 filter 系统。覆盖所有 req* 和 res* 操作指令。
+本 skill 依赖 `whistle-rules` 中定义的规则语法、pattern 和 filter 系统。覆盖所有 req*和 res* 操作指令。
 
 ## 1. 请求改写（Request）
 
@@ -98,6 +98,7 @@ www.example.com/api replaceStatus://200 includeFilter://s:500  # 只在服务器
 ```
 
 **statusCode vs replaceStatus：**
+
 - `statusCode`：不请求服务器，直接返回指定状态码
 - `replaceStatus`：请求服务器，收到响应后替换状态码
 
@@ -144,6 +145,7 @@ www.example.com/api delete://resBody
 ### HTML/CSS/JS 注入
 
 **HTML 插入：**
+
 ```
 www.example.com htmlPrepend://<script>console.log('top')</script>
 www.example.com htmlBody://<div id="injected">Content</div>
@@ -151,6 +153,7 @@ www.example.com htmlAppend://<script src="//debug.com/tool.js"></script>
 ```
 
 **CSS 注入：**
+
 ```
 www.example.com cssPrepend://body { margin-top: 50px; }
 www.example.com cssBody://.debug-outline * { outline: 1px solid red; }
@@ -158,6 +161,7 @@ www.example.com cssAppend://.custom-widget { display: none; }
 ```
 
 **JS 注入：**
+
 ```
 www.example.com jsPrepend://window.__DEBUG__ = true;
 www.example.com jsBody://console.log('Injected by Whistle');

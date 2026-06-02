@@ -65,10 +65,10 @@ When the project has files that use only Options API and other files that use Co
 
 ## Common failure modes and fixes
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `ref is not a function` | `@vue/composition-api` not registered | Add `Vue.use(VueCompositionAPI)` in setup.ts |
-| `getCurrentInstance returns null` | calling Composition API outside `setup()` | Project bug; not a test config issue |
+| Error                                          | Cause                                            | Fix                                                 |
+| ---------------------------------------------- | ------------------------------------------------ | --------------------------------------------------- |
+| `ref is not a function`                        | `@vue/composition-api` not registered            | Add `Vue.use(VueCompositionAPI)` in setup.ts        |
+| `getCurrentInstance returns null`              | calling Composition API outside `setup()`        | Project bug; not a test config issue                |
 | `Cannot read 'install' of undefined` for pinia | PiniaVuePlugin registered before Composition API | Reorder: composition-api FIRST, then PiniaVuePlugin |
 
 ## When to skip this reference

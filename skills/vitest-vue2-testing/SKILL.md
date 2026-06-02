@@ -11,15 +11,15 @@ description: Vitest (NOT Jest) + Vue 2.7 + TS + Pinia unit-testing conventions f
 
 ## Stack reference
 
-| Dimension | Version |
-|-----------|---------|
-| Vue | 2.7.8 (npm alias → vue@2.7.8) |
-| TypeScript | 6.0.3 (Babel-transpiled) |
-| Vitest | 4.1.6 |
-| `@vitejs/plugin-vue2` | 2.3.4 |
-| `@vue/test-utils` | 1.x (Vue 2 line) |
-| happy-dom | 20.9.0 |
-| Pinia | 2.0.22 + PiniaVuePlugin |
+| Dimension             | Version                       |
+| --------------------- | ----------------------------- |
+| Vue                   | 2.7.8 (npm alias → vue@2.7.8) |
+| TypeScript            | 6.0.3 (Babel-transpiled)      |
+| Vitest                | 4.1.6                         |
+| `@vitejs/plugin-vue2` | 2.3.4                         |
+| `@vue/test-utils`     | 1.x (Vue 2 line)              |
+| happy-dom             | 20.9.0                        |
+| Pinia                 | 2.0.22 + PiniaVuePlugin       |
 
 Commands:
 
@@ -53,6 +53,7 @@ export default defineConfig({
 ```
 
 Key points:
+
 - Use `@vitejs/plugin-vue2` — **not** `@vitejs/plugin-vue` (that one is for Vue 3)
 - `happy-dom` is lightweight; it does **not** make real network requests
 - `v8` coverage provider needs no Babel and is faster
@@ -62,6 +63,7 @@ Key points:
 **All `@zz-*` private dependencies are mocked once in `tests/unit/setup.ts`. Test files must not redeclare them unless they specifically need to override behavior.**
 
 The four mock files in `mocks/` are the source of truth:
+
 - `mocks/zz-ui.ts.txt`
 - `mocks/native-adapter.ts.txt`
 - `mocks/lego.ts.txt`
@@ -95,8 +97,8 @@ Vue.prototype.$setPicSize = (url: string, _size?: number) => url
 
 ## HTTP layer rule
 
-| Do not mock | Mock instead |
-|---|---|
+| Do not mock                                                                             | Mock instead                                      |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | ❌ `@zz/fetch` (transport) — globally neutralized in `setup.ts`; do not repeat per-test | ✅ `@/utils/http` per-test (the business wrapper) |
 
 ```ts
@@ -109,12 +111,12 @@ vi.mock('@/utils/http', () => ({
 
 Four target types, four templates. See `references/templates-overview.md` for which to pick.
 
-| Target | Template |
-|--------|----------|
-| API | `templates/api.template.ts.txt` |
-| Pinia store | `templates/store.template.ts.txt` |
+| Target        | Template                              |
+| ------------- | ------------------------------------- |
+| API           | `templates/api.template.ts.txt`       |
+| Pinia store   | `templates/store.template.ts.txt`     |
 | Vue component | `templates/component.template.ts.txt` |
-| Utility | `templates/utils.template.ts.txt` |
+| Utility       | `templates/utils.template.ts.txt`     |
 
 ## CDN assets
 
@@ -135,28 +137,28 @@ beforeEach(() => {
 
 ## Mock data strategy for API contracts
 
-| Situation | Strategy |
-|-----------|----------|
-| API ready + TS types exist | Construct from the types directly |
-| API ready + no TS types | Placeholder + a top-of-file `// TODO: confirm fields with PM/backend` |
-| API not ready | Minimal reasonable shape + `// @todo backfill once API is ready` |
-| Per-developer local mock files (gitignored) | Not used in this project |
+| Situation                                   | Strategy                                                              |
+| ------------------------------------------- | --------------------------------------------------------------------- |
+| API ready + TS types exist                  | Construct from the types directly                                     |
+| API ready + no TS types                     | Placeholder + a top-of-file `// TODO: confirm fields with PM/backend` |
+| API not ready                               | Minimal reasonable shape + `// @todo backfill once API is ready`      |
+| Per-developer local mock files (gitignored) | Not used in this project                                              |
 
 ## Don't list
 
-| Anti-pattern | Reason |
-|--------------|--------|
-| ❌ Re-declaring `vi.mock('@zz-common/zz-ui')` in every test | Belongs in `setup.ts` |
-| ❌ `vi.mock('@zz/fetch')` per-test | Already globally neutralized; production uses `@/utils/http` |
-| ❌ Hand-rolled canvas mock to work around lottie | Just `vi.mock('lottie-web')` |
-| ❌ Placeholder tests like `expect(Comp).toBeDefined()` | No value; write real mount + assertions |
-| ❌ `jest.fn()` / `jest.mock()` | This is Vitest — use `vi.fn()` / `vi.mock()` |
-| ❌ `import ... from '@vue/test-utils-next'` | Vue 2 uses `@vue/test-utils` 1.x |
-| ❌ `createApp()` / Vue 3 Pinia install | Use `createLocalVue().use(PiniaVuePlugin)` |
+| Anti-pattern                                                            | Reason                                                                                |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| ❌ Re-declaring `vi.mock('@zz-common/zz-ui')` in every test             | Belongs in `setup.ts`                                                                 |
+| ❌ `vi.mock('@zz/fetch')` per-test                                      | Already globally neutralized; production uses `@/utils/http`                          |
+| ❌ Hand-rolled canvas mock to work around lottie                        | Just `vi.mock('lottie-web')`                                                          |
+| ❌ Placeholder tests like `expect(Comp).toBeDefined()`                  | No value; write real mount + assertions                                               |
+| ❌ `jest.fn()` / `jest.mock()`                                          | This is Vitest — use `vi.fn()` / `vi.mock()`                                          |
+| ❌ `import ... from '@vue/test-utils-next'`                             | Vue 2 uses `@vue/test-utils` 1.x                                                      |
+| ❌ `createApp()` / Vue 3 Pinia install                                  | Use `createLocalVue().use(PiniaVuePlugin)`                                            |
 | ❌ `vi.mock('@zz-common/lego', () => ({}))` and similar empty overrides | Full override, not merge — wipes the global mock. See `references/troubleshooting.md` |
-| ❌ Reusing a shared `Vue.extend(options)` reference | `Vue.extend` mutates `options.props` — see `references/mock-patterns.md` |
-| ❌ `handleDisabledFileLoadingAsSuccess: true` to silence noise | Creates new Error entries — see `references/troubleshooting.md` |
-| ❌ Patching `HTMLScriptElement.prototype.src` setter | happy-dom uses a private `#loadScript` that bypasses it |
+| ❌ Reusing a shared `Vue.extend(options)` reference                     | `Vue.extend` mutates `options.props` — see `references/mock-patterns.md`              |
+| ❌ `handleDisabledFileLoadingAsSuccess: true` to silence noise          | Creates new Error entries — see `references/troubleshooting.md`                       |
+| ❌ Patching `HTMLScriptElement.prototype.src` setter                    | happy-dom uses a private `#loadScript` that bypasses it                               |
 
 ## When to invoke this skill
 
@@ -183,21 +185,23 @@ beforeEach(() => {
 
 ## References
 
-| File | When to load |
-|------|--------------|
-| `references/mock-patterns.md` | Authoring or auditing `setup.ts`; noise points to incomplete mocks |
-| `references/troubleshooting.md` | Per-test `vi.mock` overrides causing confusion; residual stderr noise after `setup.ts` looks complete |
-| `references/templates-overview.md` | Deciding which test template to start from |
-| `mocks/*.ts.txt` | Paste-ready reference mock files |
-| `templates/*.template.ts.txt` | Paste-ready test scaffolds |
+| File                               | When to load                                                                                          |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `references/mock-patterns.md`      | Authoring or auditing `setup.ts`; noise points to incomplete mocks                                    |
+| `references/troubleshooting.md`    | Per-test `vi.mock` overrides causing confusion; residual stderr noise after `setup.ts` looks complete |
+| `references/templates-overview.md` | Deciding which test template to start from                                                            |
+| `mocks/*.ts.txt`                   | Paste-ready reference mock files                                                                      |
+| `templates/*.template.ts.txt`      | Paste-ready test scaffolds                                                                            |
 
 ## Known-good and known-bad examples in this project
 
 Good:
+
 - API: `tests/unit/api/nlabSkuSelect.test.ts`
 - Store: `tests/unit/views/newStandard/directSaleHome/components/directSaleFlowBanner/flowDataStore.test.ts`
 - Component: `tests/unit/views/newStandard/directSaleHome/components/directSaleFlowBanner/index.test.ts`
 
 Placeholder tests that should be rewritten with real assertions:
+
 - `tests/unit/App.test.ts` (mount only, no assertions)
 - `tests/unit/views/newStandard/directSaleHome/components/SaleHeader.test.ts` (only `expect(defined)`)

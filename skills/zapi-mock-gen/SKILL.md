@@ -74,26 +74,26 @@ metadata:
 
 按表中顺序优先匹配字段名，未命中的字段根据语义 + `description` 注释推理。
 
-| 字段名模式 | 生成值 |
-|-----------|--------|
-| `id`、`ID`、`userId`、`orderId` 等 ID 字段（数值型） | 自增 ID，从 1 开始 |
-| `name`、`userName`、`nickname`、`realName` | "张三"、"李四"、"王五"轮换 |
-| `phone`、`mobile`、`tel`、`手机号` | "13800138000" |
-| `email`、`mail` | "user@example.com" |
-| `address`、`addr` | "北京市朝阳区..." |
-| `avatar`、`img`、`image`、`pic`、`cover`、`photo` | `https://picsum.photos/seed/{字段名}/{w}/{h}`（w/h 默认 200） |
-| `status`、`state`（枚举类型） | 从 enum 中取第一项 |
-| `type`（枚举类型） | 从 enum 中取第一项 |
-| `createTime`、`updateTime`、`date`、`时间` | 当前时间的 ISO 字符串 |
-| `description`、`desc`、`remark`、`备注` | "这是mock数据" |
-| `price`、`amount`、`total`、`money`、`fee`、`cost`、`budget` | 随机整数 1000~999900（以分为单位） |
-| `count`、`num`、`quantity`、`number` | 随机整数 1~100 |
-| `url`、`link` | `https://example.com/{字段名}` |
-| `page`、`pageNum` | 1 |
-| `pageSize` | 20 |
-| `total`（响应层分页） | 数组长度 |
-| 布尔类型（`is*`、`has*`、`enable*`） | `true` |
-| 未知字段名 | string→"mock_{字段名}"，number→0，boolean→false，array→[] |
+| 字段名模式                                                   | 生成值                                                        |
+| ------------------------------------------------------------ | ------------------------------------------------------------- |
+| `id`、`ID`、`userId`、`orderId` 等 ID 字段（数值型）         | 自增 ID，从 1 开始                                            |
+| `name`、`userName`、`nickname`、`realName`                   | "张三"、"李四"、"王五"轮换                                    |
+| `phone`、`mobile`、`tel`、`手机号`                           | "13800138000"                                                 |
+| `email`、`mail`                                              | "user@example.com"                                            |
+| `address`、`addr`                                            | "北京市朝阳区..."                                             |
+| `avatar`、`img`、`image`、`pic`、`cover`、`photo`            | `https://picsum.photos/seed/{字段名}/{w}/{h}`（w/h 默认 200） |
+| `status`、`state`（枚举类型）                                | 从 enum 中取第一项                                            |
+| `type`（枚举类型）                                           | 从 enum 中取第一项                                            |
+| `createTime`、`updateTime`、`date`、`时间`                   | 当前时间的 ISO 字符串                                         |
+| `description`、`desc`、`remark`、`备注`                      | "这是mock数据"                                                |
+| `price`、`amount`、`total`、`money`、`fee`、`cost`、`budget` | 随机整数 1000~999900（以分为单位）                            |
+| `count`、`num`、`quantity`、`number`                         | 随机整数 1~100                                                |
+| `url`、`link`                                                | `https://example.com/{字段名}`                                |
+| `page`、`pageNum`                                            | 1                                                             |
+| `pageSize`                                                   | 20                                                            |
+| `total`（响应层分页）                                        | 数组长度                                                      |
+| 布尔类型（`is*`、`has*`、`enable*`）                         | `true`                                                        |
+| 未知字段名                                                   | string→"mock\_{字段名}"，number→0，boolean→false，array→[]    |
 
 ## 通用返回值包装
 
@@ -155,12 +155,12 @@ autoMock/
 
 ## 边界情况
 
-| 场景 | 处理方式 |
-|------|---------|
-| ZAPI URL 无效或不可达 | 报错提示检查 URL |
-| 接口 Schema 为空 | 提示"接口未发布或无返回值定义"，建议换 JSON Schema |
-| JSON Schema 不合法 | 提示解析错误位置 |
-| TS 类型过于复杂 | 提示降级到 JSON Schema |
-| `autoMock/` 已存在 | 追加新文件，不覆盖 |
-| 同名文件已存在 | 询问是否覆盖 |
-| `.gitignore` 已含 `autoMock/` | 跳过 |
+| 场景                          | 处理方式                                           |
+| ----------------------------- | -------------------------------------------------- |
+| ZAPI URL 无效或不可达         | 报错提示检查 URL                                   |
+| 接口 Schema 为空              | 提示"接口未发布或无返回值定义"，建议换 JSON Schema |
+| JSON Schema 不合法            | 提示解析错误位置                                   |
+| TS 类型过于复杂               | 提示降级到 JSON Schema                             |
+| `autoMock/` 已存在            | 追加新文件，不覆盖                                 |
+| 同名文件已存在                | 询问是否覆盖                                       |
+| `.gitignore` 已含 `autoMock/` | 跳过                                               |

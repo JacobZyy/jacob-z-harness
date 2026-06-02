@@ -83,12 +83,12 @@ For tests that touch only one of them, only install the one you need.
 
 ## Common gotchas
 
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| `Cannot find module 'vuex'` in test | Vuex not installed for tests | Verify devDependencies; do not install just for tests |
-| `[vuex] unknown action type: foo` | Action namespace mismatch | Match `dispatch('namespace/foo', ...)` to module's `namespaced: true` |
-| Module mutations not firing in tests | Using `mocks: { $store }` (Option B) | Switch to real store (Option A) |
-| Actions not awaited | Forgot `await wrapper.vm.someMethod()` | Always `await` async store interactions before assertions |
+| Symptom                              | Cause                                  | Fix                                                                   |
+| ------------------------------------ | -------------------------------------- | --------------------------------------------------------------------- |
+| `Cannot find module 'vuex'` in test  | Vuex not installed for tests           | Verify devDependencies; do not install just for tests                 |
+| `[vuex] unknown action type: foo`    | Action namespace mismatch              | Match `dispatch('namespace/foo', ...)` to module's `namespaced: true` |
+| Module mutations not firing in tests | Using `mocks: { $store }` (Option B)   | Switch to real store (Option A)                                       |
+| Actions not awaited                  | Forgot `await wrapper.vm.someMethod()` | Always `await` async store interactions before assertions             |
 
 ## When tests should mock at the API layer instead
 

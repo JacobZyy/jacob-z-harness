@@ -43,6 +43,7 @@ www.example.com/api/data file://({"status":"ok","data":[]})
 ```
 www.example.com xfile:///Users/xxx/static
 ```
+
 本地有文件就用本地，没有就请求服务器（适合部分本地化的开发场景）。
 
 ### tpl / xtpl —— 模板替换
@@ -61,11 +62,11 @@ www.example.com/api xtpl:///User/xxx/template.json
 
 ### file vs resBody
 
-| | file | resBody |
-|------|------|------|
-| 请求服务器 | 否 | 是（先请求再替换） |
-| 状态码 | 200 | 保持原始状态码 |
-| 用途 | 完全接管响应 | 修改服务器响应 |
+|            | file         | resBody            |
+| ---------- | ------------ | ------------------ |
+| 请求服务器 | 否           | 是（先请求再替换） |
+| 状态码     | 200          | 保持原始状态码     |
+| 用途       | 完全接管响应 | 修改服务器响应     |
 
 ## 2. Map Remote（URL 转发）
 
@@ -90,6 +91,7 @@ pattern host://ipOrDomain[:port] [filters...]
 ```
 
 不写 `host://` 时可直接写 IP：
+
 ```
 www.example.com 127.0.0.1           # 保留原端口
 www.example.com 127.0.0.1:5173      # 指定端口
@@ -114,11 +116,11 @@ www.example.com proxy://127.0.0.1:8080?host=1.1.1.1:8080
 
 默认只生效一个。规则同时包含 host 和 proxy 时：
 
-| 模式 | 效果 |
-|------|------|
-| 默认 | 只有 host 生效 |
+| 模式                                             | 效果            |
+| ------------------------------------------------ | --------------- |
+| 默认                                             | 只有 host 生效  |
 | `enable://proxyFirst` / `lineProps://proxyFirst` | 只有 proxy 生效 |
-| `enable://proxyHost` / `lineProps://proxyHost` | 两者同时生效 |
+| `enable://proxyHost` / `lineProps://proxyHost`   | 两者同时生效    |
 
 ### 其他代理协议
 

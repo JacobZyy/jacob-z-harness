@@ -15,10 +15,10 @@ description: >
 
 ## 注入方式
 
-| 方式 | 脚本 | 适用场景 |
-|------|------|----------|
-| **HTTP API（推荐）** | `inject_via_api.py` | Whistle 正在运行，立即生效 |
-| 文件直写（回退） | `inject_rule.py` | Whistle 未运行，需后续重启生效 |
+| 方式                 | 脚本                | 适用场景                       |
+| -------------------- | ------------------- | ------------------------------ |
+| **HTTP API（推荐）** | `inject_via_api.py` | Whistle 正在运行，立即生效     |
+| 文件直写（回退）     | `inject_rule.py`    | Whistle 未运行，需后续重启生效 |
 
 ## 工作流程（API 注入）
 
@@ -31,6 +31,7 @@ description: >
 ### 2. 检测并选择目标实例
 
 脚本自动检测 `~/.WhistleAppData/` 下的两种实例：
+
 - **whistle-client**（桌面版）：`~/.WhistleAppData/.whistle_client/.whistle`
 - **whistle-node**（CLI 版）：`~/.WhistleAppData/.whistle`
 
@@ -53,6 +54,7 @@ python3 scripts/inject_via_api.py \
 ```
 
 脚本行为：
+
 - 自动从运行中进程获取认证凭证（authKey 或 Basic Auth）
 - 通过 `GET /rules?name=Default` 获取现有规则
 - 将新规则插入到 `defalutRules` **最顶部**（优先级最高）
@@ -61,6 +63,7 @@ python3 scripts/inject_via_api.py \
 - **无需重启 Whistle**
 
 **预览模式（不实际注入）：**
+
 ```bash
 python3 scripts/inject_via_api.py \
   --instance whistle-client \
@@ -86,6 +89,7 @@ python3 scripts/inject_rule.py \
 ## 去重逻辑
 
 去重基于 **pattern + 操作协议** 的组合：
+
 - 相同 `pattern` + 相同 `protocol://` → 视为重复，替换旧规则
 - 例如：`www.example.com/api file://(old)` 和 `www.example.com/api file://(new)` → 新规则替换旧规则
 - 不同 pattern 或不同操作协议 → 不冲突，共存
@@ -139,10 +143,10 @@ python3 scripts/inject_rule.py \
 
 ## 实例路径速查
 
-| 实例 | 数据目录 | 端口来源 |
-|------|----------|----------|
+| 实例           | 数据目录                                     | 端口来源                             |
+| -------------- | -------------------------------------------- | ------------------------------------ |
 | whistle-client | `~/.WhistleAppData/.whistle_client/.whistle` | `proxy_settings/properties` → `port` |
-| whistle-node | `~/.WhistleAppData/.whistle` | 进程参数或默认 8899 |
+| whistle-node   | `~/.WhistleAppData/.whistle`                 | 进程参数或默认 8899                  |
 
 ## 注意事项
 
@@ -152,11 +156,11 @@ python3 scripts/inject_rule.py \
 - 文件直写方式需要 Python 3，API 注入还需要 Whistle 进程可访问
 - whistle-client 每次启动会随机生成认证凭证（authKey/密码），脚本自动从进程提取
 
-## 与 whistle-* skill 体系的关系
+## 与 whistle-\* skill 体系的关系
 
-| 步骤 | 使用的 Skill |
-|------|-------------|
-| 编写规则 | `whistle-proxy` 或 `whistle-rewrite` |
-| 了解规则语法 | `whistle-rules` |
-| 注入到本地 | `whistle-rules-inject`（本 skill） |
-| 排查问题 | `whistle-advanced` |
+| 步骤         | 使用的 Skill                         |
+| ------------ | ------------------------------------ |
+| 编写规则     | `whistle-proxy` 或 `whistle-rewrite` |
+| 了解规则语法 | `whistle-rules`                      |
+| 注入到本地   | `whistle-rules-inject`（本 skill）   |
+| 排查问题     | `whistle-advanced`                   |

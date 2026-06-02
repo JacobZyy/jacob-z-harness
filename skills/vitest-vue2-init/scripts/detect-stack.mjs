@@ -31,7 +31,6 @@
 
 import fs from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(process.argv[2] || process.cwd())
 
@@ -44,7 +43,7 @@ const result = {
   privateDeps: {},
   cdnDomains: {},
   existingTestingSetup: { vitestInstalled: false, configFile: null, setupFile: null },
-  warnings: []
+  warnings: [],
 }
 
 // ---------- package.json ----------
@@ -62,7 +61,8 @@ if (vueDep) {
   const aliasMatch = vueDep.match(/npm:vue@([\d.]+)/)
   result.vueVersion = aliasMatch ? aliasMatch[1] : vueDep.replace(/^[\^~]/, '')
   const mm = result.vueVersion.match(/^(\d+)\.(\d+)/)
-  if (mm) result.vueMajorMinor = `${mm[1]}.${mm[2]}`
+  if (mm)
+    result.vueMajorMinor = `${mm[1]}.${mm[2]}`
 }
 
 result.hasCompositionApi = !!allDeps['@vue/composition-api']
@@ -94,21 +94,28 @@ const cdnRe = /(s1\.zhuanstatic\.com|s1\.zhuanspirit\.com|app\.zhuanzhuan\.com)/
 
 function* walk(dir) {
   let entries
-  try { entries = fs.readdirSync(dir, { withFileTypes: true }) } catch { return }
+  try { entries = fs.readdirSync(dir, { withFileTypes: true }) }
+  catch { return }
   for (const entry of entries) {
-    if (entry.name.startsWith('.')) continue
-    if (IGNORE_DIRS.has(entry.name)) continue
+    if (entry.name.startsWith('.'))
+      continue
+    if (IGNORE_DIRS.has(entry.name))
+      continue
     const full = path.join(dir, entry.name)
-    if (entry.isDirectory()) yield* walk(full)
-    else if (entry.isFile()) yield full
+    if (entry.isDirectory())
+      yield* walk(full)
+    else if (entry.isFile())
+      yield full
   }
 }
 
 function scanFile(filePath) {
   const ext = path.extname(filePath)
-  if (!['.vue', '.ts', '.tsx', '.js', '.jsx'].includes(ext)) return
+  if (!['.vue', '.ts', '.tsx', '.js', '.jsx'].includes(ext))
+    return
   let content
-  try { content = fs.readFileSync(filePath, 'utf8') } catch { return }
+  try { content = fs.readFileSync(filePath, 'utf8') }
+  catch { return }
 
   // tsx / jsx
   if (ext === '.tsx' || ext === '.jsx') {
@@ -123,9 +130,12 @@ function scanFile(filePath) {
     const hasTemplate = /<template[\s>]/.test(content)
     const hasPlainScript = /<script(?![^>]*\bsetup\b)[^>]*>/.test(content)
 
-    if (hasScriptSetup) result.syntaxStyles.scriptSetup += 1
-    if (hasDefineComponent && !hasScriptSetup) result.syntaxStyles.defineComponent += 1
-    if (hasClassComponent) result.syntaxStyles.classComponent += 1
+    if (hasScriptSetup)
+      result.syntaxStyles.scriptSetup += 1
+    if (hasDefineComponent && !hasScriptSetup)
+      result.syntaxStyles.defineComponent += 1
+    if (hasClassComponent)
+      result.syntaxStyles.classComponent += 1
     if (hasTemplate && hasPlainScript && !hasScriptSetup && !hasDefineComponent && !hasClassComponent) {
       result.syntaxStyles.templateOnly += 1
     }
@@ -134,7 +144,8 @@ function scanFile(filePath) {
   // private deps
   for (const m of content.matchAll(privateDepRe)) {
     const pkg = normalizePkg(m[1])
-    if (!pkg) continue
+    if (!pkg)
+      continue
     result.privateDeps[pkg] = (result.privateDeps[pkg] || 0) + 1
   }
 
@@ -150,20 +161,23 @@ function normalizePkg(rawImportPath) {
   // '@zz-common/zz-ui/lib/Foo' -> '@zz-common/zz-ui'
   // '@zz/fetch' -> '@zz/fetch'
   const parts = rawImportPath.split('/')
-  if (parts.length < 2) return null
+  if (parts.length < 2)
+    return null
   return `${parts[0]}/${parts[1]}`
 }
 
 if (fs.existsSync(SRC)) {
   for (const file of walk(SRC)) scanFile(file)
-} else {
+}
+else {
   result.warnings.push(`src/ directory not found at ${SRC}; private deps and syntax styles not scanned.`)
 }
 
 // ---------- warnings ----------
 if (result.vueMajorMinor === '2.6' && !result.hasCompositionApi && result.syntaxStyles.scriptSetup === 0) {
   // 2.6 pure options — fine
-} else if (result.vueMajorMinor === '2.6' && !result.hasCompositionApi && /defineComponent|composition/.test(JSON.stringify(result))) {
+}
+else if (result.vueMajorMinor === '2.6' && !result.hasCompositionApi && /defineComponent|composition/.test(JSON.stringify(result))) {
   result.warnings.push('Vue 2.6 detected without @vue/composition-api but composition-style usage may exist. Verify.')
 }
 if (result.syntaxStyles.tsx > 0) {
@@ -188,4 +202,4 @@ if (result.existingTestingSetup.configFile) {
   result.warnings.push(`Existing ${result.existingTestingSetup.configFile} found. vitest-vue2-init should NOT overwrite — consider vitest-vue2-testing skill instead for authoring tests.`)
 }
 
-process.stdout.write(JSON.stringify(result, null, 2) + '\n')
+process.stdout.write(`${JSON.stringify(result, null, 2)}\n`)

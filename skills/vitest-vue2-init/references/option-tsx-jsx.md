@@ -5,6 +5,7 @@
 ## Why default config breaks
 
 `@vitejs/plugin-vue2` handles `.vue` SFCs only. Vue 2's JSX syntax (`h` function injection, `v-model`/`v-on` shortcuts, slots-as-children) is NOT understood by vanilla esbuild/Babel. Without the JSX plugin:
+
 - `<MyComponent v-model={value} />` throws — Vue 2 JSX `v-model` is plugin-only sugar
 - Functional component `(h, ctx) => h('div', ctx.children)` may resolve but emit incorrect VNodes
 - Refs via `ref="foo"` in JSX won't be picked up
@@ -100,12 +101,12 @@ This pattern works under the dual-plugin setup with no additional changes.
 
 ## Common errors and fixes
 
-| Error | Likely cause | Fix |
-|-------|--------------|-----|
-| `Unexpected token <` in TSX file | `@vitejs/plugin-vue2-jsx` missing | Install and add to plugins[] |
-| `h is not defined` in render() | Vue 2 `h` not auto-injected | The plugin auto-injects; if disabled, manually import `import { h } from 'vue'` or use functional `render(h) {}` signature |
-| `Cannot find name 'JSX'` in TS | Missing JSX types | Add `import 'vue/types/jsx'` once, or extend tsconfig types |
-| Component renders but no event handlers fire | `vOn:` syntax misused | In Vue 2 JSX use `vOn:click={fn}` or `{...{ on: { click: fn }}}` for namespaced events |
+| Error                                        | Likely cause                      | Fix                                                                                                                        |
+| -------------------------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `Unexpected token <` in TSX file             | `@vitejs/plugin-vue2-jsx` missing | Install and add to plugins[]                                                                                               |
+| `h is not defined` in render()               | Vue 2 `h` not auto-injected       | The plugin auto-injects; if disabled, manually import `import { h } from 'vue'` or use functional `render(h) {}` signature |
+| `Cannot find name 'JSX'` in TS               | Missing JSX types                 | Add `import 'vue/types/jsx'` once, or extend tsconfig types                                                                |
+| Component renders but no event handlers fire | `vOn:` syntax misused             | In Vue 2 JSX use `vOn:click={fn}` or `{...{ on: { click: fn }}}` for namespaced events                                     |
 
 ## When to skip this reference
 

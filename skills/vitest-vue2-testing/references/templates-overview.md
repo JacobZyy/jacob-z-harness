@@ -4,12 +4,12 @@
 
 ## Four templates, by target type
 
-| Target type | Template file | Key pattern |
-|-------------|---------------|-------------|
-| API module | `templates/api.template.ts.txt` | `vi.mock('@/utils/http')` then assert request shape on the mock |
-| Pinia store | `templates/store.template.ts.txt` | `setActivePinia(createPinia())` in `beforeEach`; call actions; assert state |
+| Target type   | Template file                         | Key pattern                                                                             |
+| ------------- | ------------------------------------- | --------------------------------------------------------------------------------------- |
+| API module    | `templates/api.template.ts.txt`       | `vi.mock('@/utils/http')` then assert request shape on the mock                         |
+| Pinia store   | `templates/store.template.ts.txt`     | `setActivePinia(createPinia())` in `beforeEach`; call actions; assert state             |
 | Vue component | `templates/component.template.ts.txt` | `createLocalVue().use(PiniaVuePlugin)` + `mount(Component, { localVue, pinia, props })` |
-| Pure utility | `templates/utils.template.ts.txt` | Direct import + call; no environment setup needed |
+| Pure utility  | `templates/utils.template.ts.txt`     | Direct import + call; no environment setup needed                                       |
 
 ## Choosing the right one
 

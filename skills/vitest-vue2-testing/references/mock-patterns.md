@@ -7,6 +7,7 @@
 **A `vi.mock` factory must export every named symbol the production code actually accesses. Any missing export makes Vitest fall back to the real package and execute its top-level side effects.**
 
 Typical symptoms of an incomplete mock:
+
 - Repeated `DOMException [NotSupportedError]: Failed to load script "https://s1.zhuanstatic.com/.../index.min.js"` lines in stderr
 - Stack frames pointing into `node_modules/.pnpm/@zz-common+lego@x.y.z/.../lego-pagelife/index.js` or `native-adapter/.../BaseAdapter.js`
 - Tests pass, but logs are heavily polluted

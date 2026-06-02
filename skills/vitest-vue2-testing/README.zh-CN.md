@@ -14,15 +14,15 @@
 
 本项目栈：
 
-| 维度 | 版本 |
-|------|------|
-| Vue | 2.7.8（npm alias → vue@2.7.8） |
-| TypeScript | 6.0.3（Babel 转译为主） |
-| Vitest | 4.1.6 |
-| @vitejs/plugin-vue2 | 2.3.4 |
-| @vue/test-utils | 1.x（Vue 2 系列） |
-| happy-dom | 20.9.0 |
-| Pinia | 2.0.22 + PiniaVuePlugin |
+| 维度                | 版本                           |
+| ------------------- | ------------------------------ |
+| Vue                 | 2.7.8（npm alias → vue@2.7.8） |
+| TypeScript          | 6.0.3（Babel 转译为主）        |
+| Vitest              | 4.1.6                          |
+| @vitejs/plugin-vue2 | 2.3.4                          |
+| @vue/test-utils     | 1.x（Vue 2 系列）              |
+| happy-dom           | 20.9.0                         |
+| Pinia               | 2.0.22 + PiniaVuePlugin        |
 
 **核心命令**：
 
@@ -60,6 +60,7 @@ export default defineConfig({
 ```
 
 **关键点**：
+
 - `@vitejs/plugin-vue2` —— Vue 2 SFC 编译；不要用 `@vitejs/plugin-vue`（那是 Vue 3）
 - `environment: 'happy-dom'` —— 轻量浏览器环境；不真发网络请求
 - coverage provider 用 `v8`（无需 babel，速度更快）
@@ -71,6 +72,7 @@ export default defineConfig({
 **所有 `@zz-*` 私有依赖统一在 `tests/unit/setup.ts` 全局 mock，业务用例不重复声明。**
 
 参考 `mocks/` 目录下的 4 个模板：
+
 - `mocks/zz-ui.ts`
 - `mocks/native-adapter.ts`
 - `mocks/lego.ts`
@@ -116,7 +118,7 @@ Vue.prototype.$setPicSize = (url: string, _size?: number) => url
 
 ### 3.1 `@zz-common/zz-ui` mock
 
-详见 `mocks/zz-ui.ts`，原理：为所有 z-* 组件返回一个透传 slots 的最小 stub，让 `mount` 能成功渲染，业务断言不依赖 UI 库内部实现。
+详见 `mocks/zz-ui.ts`，原理：为所有 z-\* 组件返回一个透传 slots 的最小 stub，让 `mount` 能成功渲染，业务断言不依赖 UI 库内部实现。
 
 ### 3.2 `@zz-common/native-adapter` mock
 
@@ -137,8 +139,8 @@ vi.mocked(getUserInfo).mockResolvedValue({ uid: '123' })
 
 ### 3.5 业务 HTTP 层 mock 规则
 
-| 不要 mock | 要 mock |
-|---|---|
+| 不要 mock                   | 要 mock                       |
+| --------------------------- | ----------------------------- |
 | ❌ `@zz/fetch`（HTTP 底层） | ✅ `@/utils/http`（业务封装） |
 
 **理由**：业务 API 全部走 `@/utils/http`，mock 业务层既隔离了网络又避开了 zzfetch 的内部细节。
@@ -158,6 +160,7 @@ vi.mock('@/utils/http', () => ({
 **`vi.mock` 返回的对象必须覆盖业务代码真正访问的所有命名导出，缺失一个就会让 Vitest 回退到真实包并跑其顶层副作用。**
 
 诊断特征：
+
 - 终端反复刷出 `DOMException [NotSupportedError]: Failed to load script "https://s1.zhuanstatic.com/...index.min.js"`
 - 栈帧深入到 `node_modules/.pnpm/@zz-common+lego@x.y.z/.../lego-pagelife/index.js` 或 `native-adapter/.../BaseAdapter.js`
 - 用例本身通过，但日志噪声极大
@@ -214,7 +217,7 @@ dialogFn.confirm = vi.fn(() => Promise.resolve()); dialogFn.alert = vi.fn(() => 
 
 ### 3.7 setup.ts 与用例 mock 的优先级
 
-**用例文件里写 `vi.mock(...)` 会**完全覆盖** setup.ts 的同名 mock，而不是合并。**
+**用例文件里写 `vi.mock(...)` 会**完全覆盖**setup.ts 的同名 mock，而不是合并。**
 
 最常见的坑：用例只想覆盖某个方法默认行为，于是写 `vi.mock('@zz-common/lego', () => ({}))`——这会让 `lego`/`legoPerf`/`pageId` 等业务用的导出全部消失，业务模块 import 这些命名时 Vitest 回退到真实包并跑顶层副作用。
 
@@ -265,12 +268,12 @@ beforeEach(() => {
 
 完整可复制代码见 `templates/` 目录：
 
-| 模板 | 文件 | 关键模式 |
-|------|------|---------|
-| API | `templates/api.template.ts` | `vi.mock('@/utils/http')` + 校验入参 |
-| Store | `templates/store.template.ts` | `setActivePinia(createPinia())` |
+| 模板      | 文件                              | 关键模式                                      |
+| --------- | --------------------------------- | --------------------------------------------- |
+| API       | `templates/api.template.ts`       | `vi.mock('@/utils/http')` + 校验入参          |
+| Store     | `templates/store.template.ts`     | `setActivePinia(createPinia())`               |
 | Component | `templates/component.template.ts` | `createLocalVue` + `PiniaVuePlugin` + `mount` |
-| Utils | `templates/utils.template.ts` | 直接 import 调用 |
+| Utils     | `templates/utils.template.ts`     | 直接 import 调用                              |
 
 ---
 
@@ -296,30 +299,30 @@ beforeEach(() => {
 
 ## 六、接口 mock 数据策略
 
-| 场景 | 策略 |
-|------|------|
-| 接口已就绪 + 有 TS 类型 | AI 按类型直接构造合法 mock 数据 |
-| 接口已就绪 + 无 TS 类型 | 占位 + 在测试文件顶部留 `// TODO: 接口字段待 PM/后端确认` |
-| 接口未就绪 | 用最小合理结构 + 注释 `// @todo 接口就绪后回填` |
-| `mock.local`（本地 gitignore 临时数据） | **本阶段不接入**，后续按需 |
+| 场景                                    | 策略                                                      |
+| --------------------------------------- | --------------------------------------------------------- |
+| 接口已就绪 + 有 TS 类型                 | AI 按类型直接构造合法 mock 数据                           |
+| 接口已就绪 + 无 TS 类型                 | 占位 + 在测试文件顶部留 `// TODO: 接口字段待 PM/后端确认` |
+| 接口未就绪                              | 用最小合理结构 + 注释 `// @todo 接口就绪后回填`           |
+| `mock.local`（本地 gitignore 临时数据） | **本阶段不接入**，后续按需                                |
 
 ---
 
 ## 七、避坑/禁止清单
 
-| 禁止 | 原因 |
-|------|------|
-| ❌ 在每个 `.test.ts` 重复 `vi.mock('@zz-common/zz-ui')` | 应集中在 `setup.ts` |
-| ❌ `vi.mock('@zz/fetch')` | 业务全走 `@/utils/http`，mock 后者就够 |
-| ❌ 用 canvas 手工 mock 绕 lottie | 治标不治本，直接 `vi.mock('lottie-web')` |
-| ❌ 占位测试 `expect(Comp).toBeDefined()` | 没价值，应改为真 mount + 行为断言 |
-| ❌ `jest.fn()` / `jest.mock()` | 这是 Vitest，要用 `vi.fn()` / `vi.mock()` |
-| ❌ `import { ... } from '@vue/test-utils-next'` | Vue 2 用 `@vue/test-utils` 1.x，不是 next |
-| ❌ 测试里 `createApp()` / `createPinia().use()` Vue 3 写法 | 用 `createLocalVue().use(PiniaVuePlugin)` |
-| ❌ `vi.mock('@zz-common/lego', () => ({}))` 等空覆盖 | 完全覆盖而非合并 setup mock；业务 import 缺失导出时 Vitest 回退真实包跑顶层副作用 |
-| ❌ `Vue.extend()` 复用同一 options 对象 | `Vue.extend` 会改写 `props` 数组为内部对象形式，第二次展开报 "props is not iterable"；用工厂函数 |
-| ❌ `handleDisabledFileLoadingAsSuccess: true` 消噪声 | 会让 load 事件 dispatch 后 SDK 跑到 happy-dom 不支持的代码路径，新增 Error |
-| ❌ monkey-patch `HTMLScriptElement.prototype.src` setter | happy-dom 用私有 `#loadScript` 绕过 setter，无效 |
+| 禁止                                                       | 原因                                                                                             |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| ❌ 在每个 `.test.ts` 重复 `vi.mock('@zz-common/zz-ui')`    | 应集中在 `setup.ts`                                                                              |
+| ❌ `vi.mock('@zz/fetch')`                                  | 业务全走 `@/utils/http`，mock 后者就够                                                           |
+| ❌ 用 canvas 手工 mock 绕 lottie                           | 治标不治本，直接 `vi.mock('lottie-web')`                                                         |
+| ❌ 占位测试 `expect(Comp).toBeDefined()`                   | 没价值，应改为真 mount + 行为断言                                                                |
+| ❌ `jest.fn()` / `jest.mock()`                             | 这是 Vitest，要用 `vi.fn()` / `vi.mock()`                                                        |
+| ❌ `import { ... } from '@vue/test-utils-next'`            | Vue 2 用 `@vue/test-utils` 1.x，不是 next                                                        |
+| ❌ 测试里 `createApp()` / `createPinia().use()` Vue 3 写法 | 用 `createLocalVue().use(PiniaVuePlugin)`                                                        |
+| ❌ `vi.mock('@zz-common/lego', () => ({}))` 等空覆盖       | 完全覆盖而非合并 setup mock；业务 import 缺失导出时 Vitest 回退真实包跑顶层副作用                |
+| ❌ `Vue.extend()` 复用同一 options 对象                    | `Vue.extend` 会改写 `props` 数组为内部对象形式，第二次展开报 "props is not iterable"；用工厂函数 |
+| ❌ `handleDisabledFileLoadingAsSuccess: true` 消噪声       | 会让 load 事件 dispatch 后 SDK 跑到 happy-dom 不支持的代码路径，新增 Error                       |
+| ❌ monkey-patch `HTMLScriptElement.prototype.src` setter   | happy-dom 用私有 `#loadScript` 绕过 setter，无效                                                 |
 
 ---
 

@@ -5,6 +5,7 @@
 ## Detection patterns
 
 The detect-stack script flags class components when it sees:
+
 - `@Component` decorator (from `vue-class-component` or `vue-property-decorator`)
 - `extends Vue` class syntax
 
@@ -108,12 +109,12 @@ it('increments on click', async () => {
 
 ## Common errors and fixes
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `Unexpected token (after @)` | Decorator transform not applied | Add `@babel/plugin-proposal-decorators` |
-| `Cannot assign to read only property` for class field | Class fields without `loose: true` | Set `{ loose: true }` on plugin-proposal-class-properties |
-| `@Prop` value is undefined at test time | Reading `this.foo` outside class body | Decorator usage is correct only inside the class — confirm the Prop is declared inside @Component class |
-| `Mixins is not a constructor` | Missing decorator import | `import { Mixins } from 'vue-class-component'` |
+| Error                                                 | Cause                                 | Fix                                                                                                     |
+| ----------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `Unexpected token (after @)`                          | Decorator transform not applied       | Add `@babel/plugin-proposal-decorators`                                                                 |
+| `Cannot assign to read only property` for class field | Class fields without `loose: true`    | Set `{ loose: true }` on plugin-proposal-class-properties                                               |
+| `@Prop` value is undefined at test time               | Reading `this.foo` outside class body | Decorator usage is correct only inside the class — confirm the Prop is declared inside @Component class |
+| `Mixins is not a constructor`                         | Missing decorator import              | `import { Mixins } from 'vue-class-component'`                                                          |
 
 ## When to skip this reference
 
