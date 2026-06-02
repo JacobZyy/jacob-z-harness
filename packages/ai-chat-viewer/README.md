@@ -16,6 +16,7 @@ bun run scripts/dev.ts
 ```
 
 启动后访问：
+
 - **Web UI**: http://127.0.0.1:5173/
 - **API**: http://127.0.0.1:3001/
 - **Health**: http://127.0.0.1:3001/health
@@ -39,13 +40,13 @@ ai-chat-viewer/
 
 自动扫描 `~/.claude/projects/<encoded-cwd>/<session-uuid>.jsonl`，解析 8 种行类型：
 
-| 行类型 | 存储目标 |
-|--------|---------|
-| `user` / `assistant` / `system` | `ChatMessage` 表 |
-| `attachment` | `Attachment` 表（含 cwd/gitBranch/version 元数据） |
-| `permission-mode` | `Session.permissionMode` |
-| `last-prompt` | `Session.lastPrompt` |
-| `file-history-snapshot` / `queue-operation` | 仅保留 raw JSON |
+| 行类型                                      | 存储目标                                           |
+| ------------------------------------------- | -------------------------------------------------- |
+| `user` / `assistant` / `system`             | `ChatMessage` 表                                   |
+| `attachment`                                | `Attachment` 表（含 cwd/gitBranch/version 元数据） |
+| `permission-mode`                           | `Session.permissionMode`                           |
+| `last-prompt`                               | `Session.lastPrompt`                               |
+| `file-history-snapshot` / `queue-operation` | 仅保留 raw JSON                                    |
 
 首启时全量 catch-up，之后通过 chokidar 增量 tail，新行 2s 内通过 SSE 推送到前端。
 

@@ -9,11 +9,11 @@ Manage the claude-hooks statusline — a rich 4-line HUD showing model, context 
 
 ## Dispatch
 
-| Arg | Action |
-|-----|--------|
-| *(none)* / `install` | Full install |
-| `status` | Check current setup state |
-| `uninstall` | Remove launcher and statusLine config |
+| Arg                  | Action                                |
+| -------------------- | ------------------------------------- |
+| _(none)_ / `install` | Full install                          |
+| `status`             | Check current setup state             |
+| `uninstall`          | Remove launcher and statusLine config |
 
 ## Install Steps
 
@@ -33,6 +33,7 @@ if [ -f "$LAUNCHER" ]; then echo "LAUNCHER_EXISTS"; else echo "LAUNCHER_MISSING"
 ```
 
 Determine the target config dir:
+
 ```bash
 echo "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 ```

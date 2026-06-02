@@ -13,6 +13,7 @@
 ### Task 1: Create skills/zapi-mock-gen/SKILL.md
 
 **Files:**
+
 - Create: `skills/zapi-mock-gen/SKILL.md`
 
 - [ ] **Step 1: Create the skill file**
@@ -37,18 +38,19 @@ metadata:
 - 支持三种输入源的降级：ZAPI URL → JSON Schema → TypeScript 类型
 
 ## 流程概览
+```
 
-```
 用户输入 (ZAPI URL / JSON Schema / TS 类型)
-  ↓
+↓
 解析接口字段 + 类型 + 注释
-  ↓
+↓
 查字段名→Mock 值速查表 + 语义推理
-  ↓
+↓
 处理通用返回值包装
-  ↓
+↓
 写入 autoMock/{路径}.json + 更新 .gitignore
-```
+
+````
 
 ## 输入检测（降级链路）
 
@@ -62,7 +64,8 @@ metadata:
 2. 调用 zapi-to-ts 的 fetch 脚本：
    ```bash
    python3 <skills_dir>/zapi-to-ts/scripts/zapi_fetch.py --token <token> --interface-id <id>
-   ```
+````
+
 3. 从返回值中提取 `res_body`（响应体 JSON Schema）
 4. 若 Schema 为空，提示用户检查接口是否已发布或有无返回值定义
 5. ZAPI 返回的 `res_body` 只含 `respData` 内部结构，自动包装外层（见下方"通用返回值包装"）
@@ -96,26 +99,26 @@ metadata:
 
 按表中顺序优先匹配字段名，未命中的字段根据语义 + `description` 注释推理。
 
-| 字段名模式 | 生成值 |
-|-----------|--------|
-| `id`、`ID`、`userId`、`orderId` 等 ID 字段（数值型） | 自增 ID，从 1 开始 |
-| `name`、`userName`、`nickname`、`realName` | "张三"、"李四"、"王五"轮换 |
-| `phone`、`mobile`、`tel`、`手机号` | "13800138000" |
-| `email`、`mail` | "user@example.com" |
-| `address`、`addr` | "北京市朝阳区..." |
-| `avatar`、`img`、`image`、`pic`、`cover`、`photo` | `https://picsum.photos/seed/{字段名}/{w}/{h}`（w/h 默认 200） |
-| `status`、`state`（枚举类型） | 从 enum 中取第一项 |
-| `type`（枚举类型） | 从 enum 中取第一项 |
-| `createTime`、`updateTime`、`date`、`时间` | 当前时间的 ISO 字符串 |
-| `description`、`desc`、`remark`、`备注` | "这是mock数据" |
-| `price`、`amount`、`total`、`money`、`fee`、`cost`、`budget` | 随机整数 1000~999900（以分为单位） |
-| `count`、`num`、`quantity`、`number` | 随机整数 1~100 |
-| `url`、`link` | `https://example.com/{字段名}` |
-| `page`、`pageNum` | 1 |
-| `pageSize` | 20 |
-| `total`（响应层分页） | 数组长度 |
-| 布尔类型（`is*`、`has*`、`enable*`） | `true` |
-| 未知字段名 | string→"mock_{字段名}"，number→0，boolean→false，array→[] |
+| 字段名模式                                                   | 生成值                                                        |
+| ------------------------------------------------------------ | ------------------------------------------------------------- |
+| `id`、`ID`、`userId`、`orderId` 等 ID 字段（数值型）         | 自增 ID，从 1 开始                                            |
+| `name`、`userName`、`nickname`、`realName`                   | "张三"、"李四"、"王五"轮换                                    |
+| `phone`、`mobile`、`tel`、`手机号`                           | "13800138000"                                                 |
+| `email`、`mail`                                              | "user@example.com"                                            |
+| `address`、`addr`                                            | "北京市朝阳区..."                                             |
+| `avatar`、`img`、`image`、`pic`、`cover`、`photo`            | `https://picsum.photos/seed/{字段名}/{w}/{h}`（w/h 默认 200） |
+| `status`、`state`（枚举类型）                                | 从 enum 中取第一项                                            |
+| `type`（枚举类型）                                           | 从 enum 中取第一项                                            |
+| `createTime`、`updateTime`、`date`、`时间`                   | 当前时间的 ISO 字符串                                         |
+| `description`、`desc`、`remark`、`备注`                      | "这是mock数据"                                                |
+| `price`、`amount`、`total`、`money`、`fee`、`cost`、`budget` | 随机整数 1000~999900（以分为单位）                            |
+| `count`、`num`、`quantity`、`number`                         | 随机整数 1~100                                                |
+| `url`、`link`                                                | `https://example.com/{字段名}`                                |
+| `page`、`pageNum`                                            | 1                                                             |
+| `pageSize`                                                   | 20                                                            |
+| `total`（响应层分页）                                        | 数组长度                                                      |
+| 布尔类型（`is*`、`has*`、`enable*`）                         | `true`                                                        |
+| 未知字段名                                                   | string→"mock\_{字段名}"，number→0，boolean→false，array→[]    |
 
 ## 通用返回值包装
 
@@ -177,22 +180,23 @@ autoMock/
 
 ## 边界情况
 
-| 场景 | 处理方式 |
-|------|---------|
-| ZAPI URL 无效或不可达 | 报错提示检查 URL |
-| 接口 Schema 为空 | 提示"接口未发布或无返回值定义"，建议换 JSON Schema |
-| JSON Schema 不合法 | 提示解析错误位置 |
-| TS 类型过于复杂 | 提示降级到 JSON Schema |
-| `autoMock/` 已存在 | 追加新文件，不覆盖 |
-| 同名文件已存在 | 询问是否覆盖 |
-| `.gitignore` 已含 `autoMock/` | 跳过 |
-```
+| 场景                          | 处理方式                                           |
+| ----------------------------- | -------------------------------------------------- |
+| ZAPI URL 无效或不可达         | 报错提示检查 URL                                   |
+| 接口 Schema 为空              | 提示"接口未发布或无返回值定义"，建议换 JSON Schema |
+| JSON Schema 不合法            | 提示解析错误位置                                   |
+| TS 类型过于复杂               | 提示降级到 JSON Schema                             |
+| `autoMock/` 已存在            | 追加新文件，不覆盖                                 |
+| 同名文件已存在                | 询问是否覆盖                                       |
+| `.gitignore` 已含 `autoMock/` | 跳过                                               |
+
+````
 
 - [ ] **Step 2: Run lint check**
 
 ```bash
 cd /Users/jacobzha/Documents/workspace/jacob-open-source/jacob-skills-collection && pnpm lint:fix
-```
+````
 
 Expected: Should pass with no errors (SKILL.md is Markdown, lint will not complain).
 
