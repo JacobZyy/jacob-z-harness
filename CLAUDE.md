@@ -7,26 +7,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 个人 Claude Code / oh-my-pi 工具集仓库。收集和整理个人开发的 AI 代码 agent 工具、脚本和配置。
 
 - 仓库: GitHub `https://github.com/JacobZyy/jacob-z-harness`
-- 包管理: pnpm
+- 包管理: Bun
 - 类型: ESM (`"type": "module"`)
 
 ## Common Commands
 
 ```bash
 # 安装依赖
-pnpm install
+bun install
 
 # 代码检查
-pnpm lint          # 运行 ESLint
-pnpm lint:fix      # 自动修复 ESLint 问题
+bun run lint          # 运行 ESLint
+bun run lint:fix      # 自动修复 ESLint 问题
 ```
 
 ## Code Style
 
 - ESLint: `@antfu/eslint-config@8.2.0` with `formatters: true`
 - 配置文件: `eslint.config.js` (ESM 格式)
-- `pnpm lint:fix` 会自动排序 JSON keys、格式化代码等
-- 提交前运行 `pnpm lint:fix` 确保代码通过检查
+- `bun run lint:fix` 会自动排序 JSON keys、格式化代码等
+- 提交前运行 `bun run lint:fix` 确保代码通过检查
 
 ## Repository Workflow
 
@@ -53,4 +53,4 @@ vitest.config.ts        # Vitest 测试配置
 
 - `.omc/`、`.omo/`、`coverage/`、`node_modules/` 在 `.gitignore` 中，不会被提交
 - `.idea/` 目录包含 IntelliJ IDEA 配置，已纳入版本控制
-- 测试框架: Vitest，运行 `pnpm test` 执行测试
+- 测试框架: Vitest，运行 `bun run test` 执行测试

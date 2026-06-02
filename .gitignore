@@ -1,6 +1,7 @@
 .omc/
 .omo/
 node_modules/
+bun.lock
 coverage/
 *.log
 .DS_Store
