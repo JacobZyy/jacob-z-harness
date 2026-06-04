@@ -7,8 +7,8 @@
   },
   "plugins": [
     {
-      "name": "claude-hooks",
-      "source": "./plugins/claude-hooks",
+      "name": "hyperclaudemia",
+      "source": "./plugins/hyperclaudemia",
       "description": "用户级 hooks：oxlint 类型偷懒断言门禁 + 嵌套复杂度检测 + ESLint 自动修复 + token 消耗记录",
       "version": "1.8.0",
       "category": "devtools",

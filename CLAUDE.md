@@ -42,7 +42,7 @@ git push origin main
 .claude-plugin/         # Marketplace 声明
   marketplace.json
 plugins/                # 插件
-  claude-hooks/         # oxlint 门禁 + token 消耗记录
+  hyperclaudemia/       # oxlint 门禁 + token 消耗记录
   hyperpiemia/          # oh-my-pi skills（vitest、whistle、zapi）
 packages/               # 子项目
 eslint.config.js        # ESLint 配置 (ESM)

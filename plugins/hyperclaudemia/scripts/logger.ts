@@ -1,5 +1,5 @@
 /**
- * 统一 hook 日志模块 — 所有 claude-hooks 共用。
+ * 统一 hook 日志模块 — 所有 hyperclaudemia 共用。
  *
  * 日志路径: ~/.claude/data/hooks.log  (JSONL 格式)
  * 每行一条: { ts, hook, script, level, msg, duration_ms?, detail? }

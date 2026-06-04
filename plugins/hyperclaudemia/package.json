@@ -1,5 +1,5 @@
 {
-  "name": "claude-hooks",
+  "name": "hyperclaudemia",
   "private": true,
   "dependencies": {
     "@prisma/client": "^6.9.0",

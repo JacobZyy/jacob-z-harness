@@ -8,7 +8,7 @@
 
 ## 内容
 
-- `plugins/claude-hooks/` — Claude Code 用户级 hooks（oxlint 门禁、复杂度检测、ESLint 自动修复、token 统计）
+- `plugins/hyperclaudemia/` — Claude Code 用户级 hooks（oxlint 门禁、复杂度检测、ESLint 自动修复、token 统计）
 - `plugins/hyperpiemia/` — oh-my-pi 自建 skills（Vitest 测试框架、Whistle 代理调试、ZAPI 接口工具）
 - `packages/` — 子项目（ai-chat-viewer 等）
 

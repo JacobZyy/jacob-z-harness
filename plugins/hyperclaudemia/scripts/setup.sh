@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Claude Code SessionStart hook: 确保 claude-hooks 插件依赖就绪。
+# Claude Code SessionStart hook: 确保 hyperclaudemia 插件依赖就绪。
 # 检查 Prisma client 是否已生成，没有则同步执行 install + generate + db push。
 # 放在 SessionStart 而不是 Stop/PostToolUse，避免每次工具调用都检查。
 
@@ -34,7 +34,7 @@ _hook_log_done() {
 
 # ── 版本日志 ──────────────────────────────────────────────────────────────
 VERSION=$(grep '"version"' "$PLUGIN_ROOT/plugin.json" 2>/dev/null | head -1 | sed 's/.*"version" *: *"\([^"]*\)".*/\1/')
-echo "{\"systemMessage\":\"[claude-hooks] v${VERSION:-unknown} loaded\"}"
+echo "{\"systemMessage\":\"[hyperclaudemia] v${VERSION:-unknown} loaded\"}"
 _hook_log "info" "v${VERSION:-unknown} loaded"
 
 # ── 确保 .env 存在（Prisma 需要 DATABASE_URL） ────────────────────────────

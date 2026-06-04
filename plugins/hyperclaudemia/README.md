@@ -1,4 +1,4 @@
-# claude-hooks
+# hyperclaudemia
 
 Claude Code 用户级 hooks 插件：oxlint 类型偷懒断言门禁 + token 消耗记录。
 
