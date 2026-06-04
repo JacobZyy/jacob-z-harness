@@ -8,7 +8,7 @@
  *   { "enabledProjects": ["/absolute/path/to/project1", ...] }
  * 仅当 CWD 在 enabledProjects 列表中时才执行检测。
  *
- * 输出协议（同 oxlint-stop.ts）：
+ * 输出协议（同 lint-fix-stop.ts）：
  *   stdout 写一行 JSON：{ systemMessage, decision?, reason? }
  *     - systemMessage   UI 渲染成 "L Stop says: ..."
  *     - decision=block  阻断 Stop

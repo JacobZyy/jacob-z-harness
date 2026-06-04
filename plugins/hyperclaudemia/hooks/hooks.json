@@ -8,6 +8,11 @@
             "type": "command",
             "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/setup.sh",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "bun run --bun ${CLAUDE_PLUGIN_ROOT}/scripts/lint-strategy-warmup.ts",
+            "timeout": 10
           }
         ]
       }
@@ -30,18 +35,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun run --bun ${CLAUDE_PLUGIN_ROOT}/scripts/oxlint-stop.ts",
+            "command": "bun run --bun ${CLAUDE_PLUGIN_ROOT}/scripts/lint-fix-stop.ts",
             "timeout": 60
           },
           {
             "type": "command",
             "command": "bun run --bun ${CLAUDE_PLUGIN_ROOT}/scripts/complexity-stop.ts",
             "timeout": 60
-          },
-          {
-            "type": "command",
-            "command": "bun run --bun ${CLAUDE_PLUGIN_ROOT}/scripts/eslint-fix-stop.ts",
-            "timeout": 30
           },
           {
             "type": "command",
