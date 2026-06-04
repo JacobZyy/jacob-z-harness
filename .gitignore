@@ -1,5 +1,6 @@
 .omc/
 .omo/
+.omp/
 node_modules/
 bun.lock
 coverage/

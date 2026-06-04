@@ -77,8 +77,8 @@ export interface HookLogger {
  *
  * @example
  * ```ts
- * const log = createHookLogger('PostToolUse', 'token-stats-tool.ts');
- * log.info('tool call recorded');
+ * const log = createHookLogger('Stop', 'token-stats-stop.ts');
+ * log.info('turn usage recorded');
  * log.done('completed'); // 自动附带 duration
  * ```
  */

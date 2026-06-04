@@ -8,7 +8,6 @@ Claude Code 用户级 hooks 插件：lint 门禁（策略嗅探 + 自动修复 +
 | ------------ | ------------------------- | ----------------------------------------------------------------------------------------------------- |
 | SessionStart | `setup.sh`                | 检查 Prisma client 就绪，未就绪则自动 install + generate + db push                                    |
 | SessionStart | `lint-strategy-warmup.ts` | 预热当前项目的 lint 策略并写入 `.omp/lint-strategy.json` 缓存                                         |
-| PostToolUse  | `token-stats-tool.ts`     | 记录每次工具调用的名称、结果 token 估算到 SQLite                                                      |
 | Stop         | `lint-fix-stop.ts`        | 按项目根分组改动文件，嗅探策略走 `eslint --fix` 或 `oxfmt → oxlint --fix`，修复后仍有残留违规则 block |
 | Stop         | `token-stats-stop.ts`     | 记录每轮对话的 token 消耗（input/output/cache）到 SQLite                                              |
 

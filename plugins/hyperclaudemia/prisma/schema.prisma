@@ -26,19 +26,3 @@ model TurnUsage {
   @@index([tsEnd])
   @@index([model])
 }
-
-model ToolCall {
-  id                 Int      @id @default(autoincrement())
-  sessionId          String
-  turnIdx            Int
-  toolName           String
-  toolInputPreview   String?
-  toolResultChars    Int
-  toolResultTokenEst Int
-  ts                 DateTime
-
-  @@index([sessionId])
-  @@index([toolName])
-  @@index([toolResultTokenEst])
-  @@index([ts])
-}

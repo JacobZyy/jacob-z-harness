@@ -1,7 +1,7 @@
 {
   "name": "hyperclaudemia",
   "description": "用户级 hooks：lint 门禁（策略嗅探 + oxfmt/eslint 自动修复 + 残留硬拦）+ 嵌套复杂度检测 + token 消耗记录",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "author": {
     "name": "Jacob Zhang"
   }
