@@ -29,39 +29,64 @@
 | 策略与门禁关系 | `--fix` 跑完修不掉的 **remaining 一律硬 block**,保留门禁的强制性质 |
 | hook 数量 | 把 `oxlint-stop.ts` + `eslint-fix-stop.ts` 合并为单个 `lint-fix-stop.ts`,Stop 数组 4 → 3 |
 | 策略缓存 | 落到项目 `.omp/lint-strategy.json`,**与 oxlint-gate 共用同一文件、同一格式**,谁先跑谁建 |
+| 嗅探时机 | SessionStart 对启动 cwd 预热(对齐 oxlint-gate `session_start`);Stop 阶段按项目根分组,未命中缓存现场嗅探 |
+| 跨项目 | 改动文件按项目根分组,每组独立嗅探 + 独立跑 fix(不沿用旧的取首文件根偷懒法) |
 | 测试 | `__tests__/` 下新建 `lint-fix-stop` 测试(现有仅 `sample.test.ts`,无旧 lint 测试需迁移) |
 
-## 3. 架构:`lint-fix-stop.ts` 单流水线
+## 3. 架构:两阶段
+
+嗅探与 lint 是正交的两件事:**嗅探针对项目根**(决定用哪条工具链),**lint 针对本会话改动文件**。
+
+### 阶段 A — SessionStart 预热(对齐 oxlint-gate 的 `session_start`)
+
+```
+SessionStart hook
+  └─ 对启动 cwd 嗅探策略(读 package.json eslint 版本)
+       └─ 写 .omp/lint-strategy.json(与 oxlint-gate 共用)
+```
+
+只能预热「启动 cwd」这一个项目根。多目录会话里其它项目根的策略,留到 Stop 阶段未命中时现场嗅探。
+
+### 阶段 B — Stop 主流程(`lint-fix-stop.ts`)
 
 ```
 读 stdin / 解析 transcript
   └─ 捞本会话 Edit/Write/MultiEdit 触达且仍存在的 .ts/.tsx/.mts/.cts/.vue
        │
        ▼
-策略探测(读项目 package.json 的 eslint 版本,缓存 .omp/lint-strategy.json)
+按项目根分组(detectProjectRoot,每个文件向上找最近 package.json)
   │
-  ├─ eslint≥9 策略 ──→ eslint --fix(项目级,自带格式化)
-  │                         │
-  │                         ▼
-  │                    check remaining
-  │
-  └─ oxc 策略(否则)─→ oxfmt(读 ~/.config/oxlint/oxfmt.json)
-                            │
-                            ▼
-                       ignorePatterns 过滤(Bun.Glob,读 oxlintrc)
-                            │
-                            ▼
-                       oxlint --fix -c ~/.config/oxlint/oxlintrc.json
-                            │
-                            ▼
-                       check remaining
+  └─ 对每个项目根分组:
        │
        ▼
-结果分流:
-  ├─ 0 violations    → systemMessage 报通过,放行
-  ├─ remaining 错误   → decision=block + 报告 + ts-type-discipline 协议
-  └─ 工具没装/故障    → fail-open,systemMessage 提示跳过,不 block
+     读 .omp/lint-strategy.json
+       ├─ 命中合法 strategy → 直接用
+       └─ 未命中 / 损坏    → 现场嗅探并回写
+       │
+       ├─ eslint≥9 策略 ──→ eslint --fix(项目级,自带格式化)
+       │                         │
+       │                         ▼
+       │                    check remaining
+       │
+       └─ oxc 策略(否则)─→ oxfmt(读 ~/.config/oxlint/oxfmt.json)
+                                 │
+                                 ▼
+                            ignorePatterns 过滤(Bun.Glob,读 oxlintrc)
+                                 │
+                                 ▼
+                            oxlint --fix -c ~/.config/oxlint/oxlintrc.json
+                                 │
+                                 ▼
+                            check remaining
+       │
+       ▼
+汇总各组结果:
+  ├─ 全部 0 violations → systemMessage 报通过,放行
+  ├─ 任一组 remaining   → decision=block + 报告 + ts-type-discipline 协议
+  └─ 工具没装/故障      → 该组 fail-open,systemMessage 提示跳过,不 block
 ```
+
+每组各自嗅探、各自跑 fix(`spawnSync` 的 `cwd` 用该组项目根);任一组有 remaining 即 block,把所有组的报告汇总塞回 Claude。
 
 `stop_hook_active === true` 时不重复 block(防死循环),改为 systemMessage 提示尽快修复。
 
@@ -72,11 +97,17 @@
 - 输出: 本会话 Edit/Write/MultiEdit 触达、扩展名匹配、且 `statSync` 仍存在的文件绝对路径数组
 - 依赖: 现有 `extractEditedFiles` / `isWriteTool` / `isExistingFile`,沿用不改
 
-### 4.2 策略探测(移植 oxlint-gate `sniffStrategy`)
+### 4.2 策略嗅探(移植 oxlint-gate `sniffStrategy`)
+- 触发点: ① SessionStart 对启动 cwd 预热; ② Stop 阶段每个项目根分组未命中缓存时现场嗅探
 - 输入: 项目根 `package.json`
 - 逻辑: 读 `dependencies` + `devDependencies` 的 `eslint`,剥前缀取主版本号;主版本 ≥ 9 → `eslint` 策略,否则 → `oxc` 策略
-- 缓存: 读/写项目 `.omp/lint-strategy.json`,结构与 oxlint-gate 一致(`{ strategy, eslintVersion?, sniffedAt }`);命中缓存直接用,未命中现探测并写回
+- 缓存: 读/写项目 `.omp/lint-strategy.json`,结构与 oxlint-gate 一致(`{ strategy, eslintVersion?, sniffedAt }`);命中合法 strategy 直接用,读不出合法值(未命中/损坏/跨工具格式漂移)→ fail-safe 重新嗅探并回写
 - 项目根: 沿用 `eslint-fix-stop.ts` 的 `detectProjectRoot`(从文件向上找最近 package.json)
+
+### 4.2.1 跨项目分组(CC 特有)
+- 一次会话可能编辑跨多个项目根的文件(多目录会话是常态)
+- 改动文件先 `detectProjectRoot` 分组,**每组独立嗅探 + 独立跑 fix**,`spawnSync` 的 `cwd` 用该组项目根
+- 不沿用 `eslint-fix-stop.ts` 旧的 `detectProjectRoot(allFiles[0])` 偷懒法(只取首个文件根,跨项目会用错策略/错 cwd)
 
 ### 4.3 oxc 策略链
 1. `oxfmt <files>` — 读 `~/.config/oxlint/oxfmt.json`;没装 oxfmt → 跳过(fail-open)
@@ -94,7 +125,10 @@
 
 ## 5. hooks.json 变化
 
-Stop 数组从 4 项变 3 项:
+### SessionStart(新增策略预热)
+现有 SessionStart 跑 `setup.sh`,在其后追加一个预热步骤:对启动 cwd 嗅探策略并写 `.omp/lint-strategy.json`。可并入 `setup.sh` 末尾,或新增独立脚本(倾向并入 `lint-fix-stop.ts` 暴露的嗅探函数,由一个轻量入口调用,避免逻辑两处实现)。
+
+### Stop(数组 4 → 3)
 
 ```jsonc
 "Stop": [
@@ -104,18 +138,19 @@ Stop 数组从 4 项变 3 项:
 ]
 ```
 
-删除 `oxlint-stop.ts`、`eslint-fix-stop.ts`,新增 `lint-fix-stop.ts`。
+删除 `oxlint-stop.ts`、`eslint-fix-stop.ts`,新增 `lint-fix-stop.ts`。嗅探逻辑作为 `lint-fix-stop.ts` 的可导出函数,供 SessionStart 预热复用。
 
 ## 6. 测试
 
 在 `__tests__/` 下新建 `lint-fix-stop.test.ts`,覆盖:
 
-1. **策略探测分流** — package.json eslint@9 → eslint 策略;无 eslint / eslint@8 → oxc 策略;缓存命中复用
-2. **oxc 链** — oxfmt 调用 → ignorePatterns 过滤 → oxlint --fix → check
-3. **eslint 链** — eslint --fix 调用,无 oxfmt
-4. **remaining 硬 block** — fix 后仍有违规 → `decision=block` + 协议文案
-5. **fail-open** — oxlint/oxfmt/eslint 未安装或 spawn error → 不 block,systemMessage 提示跳过
-6. **防死循环** — `stop_hook_active=true` 时不重复 block
+1. **策略嗅探分流** — package.json eslint@9 → eslint 策略;无 eslint / eslint@8 → oxc 策略;缓存命中复用;缓存损坏 → fail-safe 重嗅探
+2. **跨项目分组** — 改动文件跨两个项目根 → 各自按本组策略跑 fix,cwd 用各自项目根
+3. **oxc 链** — oxfmt 调用 → ignorePatterns 过滤 → oxlint --fix → check
+4. **eslint 链** — eslint --fix 调用,无 oxfmt
+5. **remaining 硬 block** — fix 后仍有违规 → `decision=block` + 协议文案;多组时报告汇总
+6. **fail-open** — oxlint/oxfmt/eslint 未安装或 spawn error → 该组不 block,systemMessage 提示跳过
+7. **防死循环** — `stop_hook_active=true` 时不重复 block
 
 外部进程(`spawnSync`)与文件系统用 mock;策略缓存文件读写用临时目录。
 
