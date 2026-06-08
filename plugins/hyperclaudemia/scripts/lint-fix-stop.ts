@@ -4,7 +4,7 @@ import type { HookResponse, OrchestratorDeps } from './lib/lint-orchestrator.ts'
 import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { createHookLogger } from './logger.ts';
+import { createHookLogger, LOG_PATH } from './logger.ts';
 import { runEslintFix, runOxfmt, runOxlintFixCheck } from './lib/lint-runners.ts';
 import { filterByIgnorePatterns, loadIgnorePatterns } from './lib/oxlint-ignore.ts';
 import { buildResponse, processGroups } from './lib/lint-orchestrator.ts';
@@ -63,6 +63,7 @@ function main(): void {
   } else {
     log.done('silent (no edited files / no transcript)');
   }
+  process.stderr.write(`[lint-fix-stop] log: ${LOG_PATH}\n`);
   process.exit(0);
 }
 
