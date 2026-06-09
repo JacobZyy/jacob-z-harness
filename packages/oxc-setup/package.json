@@ -4,7 +4,7 @@
   "description": "Interactive CLI to initialize oxlint + oxfmt configs for opencode, with auto company/personal detection",
   "type": "module",
   "bin": {
-    "oxc-setup": "dist/cli.js"
+    "oxc-setup": "dist/cli.mjs"
   },
   "exports": {
     ".": {
@@ -16,8 +16,8 @@
   ],
   "scripts": {
     "dev": "bun run src/cli.ts",
-    "build": "tsup",
-    "prepublishOnly": "tsup"
+    "build": "tsdown",
+    "prepublishOnly": "tsdown"
   },
   "keywords": [
     "oxlint",
@@ -39,7 +39,6 @@
   "devDependencies": {
     "@types/node": "^25.6.2",
     "tsdown": "^0.22.2",
-    "tsup": "^8.5.1",
     "typescript": "^5.8.0"
   }
 }
