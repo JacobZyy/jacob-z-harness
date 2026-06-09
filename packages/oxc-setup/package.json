@@ -1,13 +1,35 @@
 {
-  "name": "oxc-setup",
+  "name": "@jacob-z/opencode-oxc-lsp-initiator",
   "version": "0.1.0",
+  "description": "Interactive CLI to initialize oxlint + oxfmt configs for opencode, with auto company/personal detection",
   "type": "module",
-  "private": true,
   "bin": {
-    "oxc-setup": "src/cli.ts"
+    "oxc-setup": "dist/cli.js"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "dev": "bun run src/cli.ts"
+    "dev": "bun run src/cli.ts",
+    "build": "tsup",
+    "prepublishOnly": "tsup"
+  },
+  "keywords": [
+    "oxlint",
+    "oxfmt",
+    "opencode",
+    "lsp",
+    "formatter",
+    "cli"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@clack/prompts": "^0.9.1",
@@ -16,6 +38,8 @@
   },
   "devDependencies": {
     "@types/node": "^25.6.2",
+    "tsdown": "^0.22.2",
+    "tsup": "^8.5.1",
     "typescript": "^5.8.0"
   }
 }
