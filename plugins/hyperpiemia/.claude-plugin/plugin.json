@@ -1,8 +1,0 @@
-{
-  "name": "hyperpiemia",
-  "version": "0.1.0",
-  "description": "oh-my-pi 自建 skills 集合：测试框架、Whistle 代理调试、ZAPI 接口工具",
-  "author": {
-    "name": "Jacob Zhang"
-  }
-}
